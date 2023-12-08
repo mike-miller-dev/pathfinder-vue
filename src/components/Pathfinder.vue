@@ -18,10 +18,9 @@
         </select>
 
         <div v-if="selectedAttack">
+          <span>{{ selectedAttack.name }}</span>
           <div v-for="(attack, index) in fullAttacks">
-            <p>{{ attack.value }} {{ attack.name }}</p>
-            <p>{{ fullDamage }}</p>
-            <br />
+            <p>{{ attack.value }} {{ attack.name }} for {{ fullDamage }}</p>
           </div>
           
         </div>
@@ -78,7 +77,7 @@ export default defineComponent({
           conditionals: [
             { name: 'power attack', bonuses: [ { meleeAttack: -2, damage1h: +4, damage2h: +6  } ] },
             { name: 'flanking', bonuses: [ { meleeAttack: 2 }]},
-            { name: 'vs robot', bonuses: [ { attackMod: 1 }]},
+            { name: 'robot slayer', bonuses: [ { attackMod: 1, type: 'trait' }]},
           ]
         },
       ],
@@ -138,7 +137,7 @@ export default defineComponent({
       if (this.selectedAttack.enhDamage) {
         attackString += `+${this.selectedAttack.enhDamage}[enh]`;
       }
-      attackString += this.parseBuff('damage');
+      attackString += this.parseBuff('damageMod');
       if (this.selectedAttack.type == 'melee1h') {
         attackString += this.parseBuff('damageMelee');
         attackString += this.parseBuff('damage1h');
@@ -167,7 +166,7 @@ export default defineComponent({
 
       //first attack
       fullAttacks.push({
-        name: '1',
+        name: 'attack' + (this.baseAttacks.length > 1 ? ' 1' : ''),
         value: this.fullAttack(this.baseAttacks[0])
       });
 
@@ -191,7 +190,7 @@ export default defineComponent({
       for (var i = 1; i < this.baseAttacks.length; i++) {
         let iterative = this.baseAttacks[i];
         fullAttacks.push({
-          name: i+1,
+          name: 'attack ' + (i+1),
           value: this.fullAttack(iterative)
         });
       }
@@ -209,7 +208,7 @@ export default defineComponent({
           ? `d20cs>${this.selectedAttack.crit}`
           : 'd20';
         var attack = `${dieRoll}+${baseAttack}[base]+${this.attackStatBonus}[${this.selectedAttack.stat}]${this.attackBuffs}`
-        return `[[ ${attack} ]] ${this.selectedAttack.name}`;
+        return `[[ ${attack} ]]`;
       },
       parseBuff(buffName) {
         let attackString = '';
