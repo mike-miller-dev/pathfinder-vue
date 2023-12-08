@@ -54,8 +54,10 @@ export default defineComponent({
           baseAttack: 4,
           str: 19,
           attacks: [
-            { name: 'mw nodachi', stat:'str', type: 'melee2h', attackMod: 8, damageDice: '3d6', damageMod: 12, damageRoll: 10.5, largeDamageDice: '4d6', largeDamageRoll: 14, largeDamageMod: 14, crit: 17},
-            { name: 'unarmed', stat:'str', type: 'melee1h', attackMod: 7, damageDice: '2d6', damageMod: 11, damageRoll: 7, largeDamageDice: '3d6', largeDamageRoll: 10.5, largeDamageMod: 13},
+            { name: 'mw nodachi', stat:'str', type: 'melee2h', enhAttack: 1, damageDice: 'd10', crit: 18},
+            { name: 'bardiche', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
+            { name: 'heavy flail', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
+            { name: 'unarmed', stat:'str', type: 'melee1h', damageDice: '1d6' },
           ],
           bigUps: [
             { name: 'none', large: false},
@@ -66,32 +68,12 @@ export default defineComponent({
             { name: 'opp attack', type: 'melee', attackMod: 4, selected: false},
           ],
           partyBuffs : [
-            { 
-              name: 'flagbearer', 
-              bonuses: [
-                {
-                  attackMod: 1, damageMod: 1, fearSave:1, charmSave: 1, type: 'morale'
-                }
-              ]
-            },
-            { 
-              name: 'haste', 
-              bonuses: [
-                {
-                  attackMod: 1, extraAttacks: 1
-                }
-              ]
-            },
+            {  name: 'flagbearer',  bonuses: [ { attackMod: 1, damageMod: 1, fearSave:1, charmSave: 1, type: 'morale' } ] },
+            {  name: 'inspire courage',  bonuses: [ { attackMod: 1, damageMod: 1, type: 'competence' } ] },
+            { name: 'haste', bonuses: [ { attackMod: 1, extraAttacks: 1 } ] },
           ],
           selfBuffs : [
-            { 
-              name: 'rage', 
-              bonuses: [
-                {
-                  str: 4, type: 'morale'
-                }
-              ]
-            }
+            { name: 'rage', bonuses: [ { str: 4, type: 'morale' } ] }
           ],
           conditionals: [
             { name: 'power attack', bonuses: [ { meleeAttack: -2, damage1h: +4, damage2h: +6  } ] },
@@ -141,14 +123,22 @@ export default defineComponent({
       }
     },
     attackBuffs() {
-      let attackString = this.parseBuff('attackMod');
+      let attackString = '';
+      if (this.selectedAttack.enhAttack) {
+        attackString += `+${this.selectedAttack.enhAttack}[enh]`;
+      }
+      attackString += this.parseBuff('attackMod');
       if (this.selectedAttack.type == 'melee1h' || this.selectedAttack.type == 'melee2h') {
         attackString += this.parseBuff('meleeAttack');
       }
       return attackString;
     },
     damageBuffs() {
-      let attackString = this.parseBuff('damage');
+      let attackString = '';
+      if (this.selectedAttack.enhDamage) {
+        attackString += `+${this.selectedAttack.enhDamage}[enh]`;
+      }
+      attackString += this.parseBuff('damage');
       if (this.selectedAttack.type == 'melee1h') {
         attackString += this.parseBuff('damageMelee');
         attackString += this.parseBuff('damage1h');
@@ -215,7 +205,10 @@ export default defineComponent({
   },
   methods: {
       fullAttack(baseAttack) {
-        var attack = `d20+${baseAttack}[base]+${this.attackStatBonus}[${this.selectedAttack.stat}]${this.attackBuffs}`
+        var dieRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
+          ? `d20cs>${this.selectedAttack.crit}`
+          : 'd20';
+        var attack = `${dieRoll}+${baseAttack}[base]+${this.attackStatBonus}[${this.selectedAttack.stat}]${this.attackBuffs}`
         return `[[ ${attack} ]] ${this.selectedAttack.name}`;
       },
       parseBuff(buffName) {
