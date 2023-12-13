@@ -17,12 +17,14 @@
           </option>
         </select>
 
-        <div v-if="selectedAttack">
-          <span>{{ selectedAttack.name }}</span>
-          <div v-for="(attack, index) in fullAttacks">
-            <p>{{ attack.value }} {{ attack.name }} for {{ fullDamage }}</p>
-          </div>
-          
+        <div>
+          <input type="checkbox" key="isSingleAttack" id="isSingleAttack" name="isSingleAttack" v-model="isSingleAttack">
+          <label for="isSingleAttack">Single Attack</label>
+        </div>
+        <br />
+
+        <div v-if="fullAttackMacro">
+          {{fullAttackMacro}}
         </div>
 
         
@@ -47,13 +49,14 @@ export default defineComponent({
       selectedCharacter: null,
       selectedAttack: null,
       combinedBuffs: [],
+      isSingleAttack: false,
       characters : [
         {
           name: 'Deebo',
           baseAttack: 4,
           str: 19,
           attacks: [
-            { name: 'mw nodachi', stat:'str', type: 'melee2h', enhAttack: 1, damageDice: 'd10', crit: 18},
+            { name: 'MW Nodachi', stat:'str', type: 'melee2h', enhAttack: 1, damageDice: 'd10', crit: 18},
             { name: 'bardiche', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'heavy flail', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'unarmed', stat:'str', type: 'melee1h', damageDice: '1d6' },
@@ -170,6 +173,10 @@ export default defineComponent({
         value: this.fullAttack(this.baseAttacks[0])
       });
 
+      if (this.isSingleAttack) {
+        return fullAttacks;
+      }
+
       for (var extraAttackIndex in this.extraAttacks) {
         let extraAttack = this.extraAttacks[extraAttackIndex];
         if (extraAttack.value == 1) {
@@ -201,6 +208,14 @@ export default defineComponent({
       var attack = `${this.selectedAttack.damageDice}+${this.damageStatBonus}[${this.selectedAttack.stat}]${this.damageBuffs}`
       return `[[ ${attack} ]] dmg`;
     },
+    fullAttackMacro() {
+      let macro = `&{template:default} {{name=${this.selectedAttack.name}}}`;
+      for (var i = 0; i < this.fullAttacks.length; i++) {
+        let attack = this.fullAttacks[i];
+        macro += `{{ ${ attack.name }=${ attack.value } for ${ this.fullDamage }}}`;
+      }
+      return macro;
+    }
   },
   methods: {
       fullAttack(baseAttack) {
