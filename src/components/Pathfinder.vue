@@ -206,7 +206,7 @@ export default defineComponent({
         } else if (extraAttack.value > 1) {
           for (var i = 0; i < extraAttack.value; i++) {
             fullAttacks.push({
-              name: extraAttack.name + ' ' + (i+1),fullAttack
+              name: extraAttack.name + ' ' + (i+1),
               value: this.fullAttack(this.baseAttacks[0])
             });
           }
