@@ -36,15 +36,15 @@ export default defineComponent({
     width: 125px;
   }
   .toggle {
-         position: relative;
-         display: block;
-         width: 125px;
-         height: 40px;
-         padding: 3px;
-         margin: auto;
-         border-radius: 50px;
-         cursor: pointer;
-      }
+        position: relative;
+        display: block;
+        width: 125px;
+        height: 40px;
+        padding: 3px;
+        margin: auto;
+        border-radius: 50px;
+        cursor: pointer;
+    }
       .toggle-input {
          position: absolute;
          top: 0;

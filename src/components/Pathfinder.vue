@@ -30,7 +30,6 @@
       </div>
     </div>
     
-    
   </div>
 
 </template>
@@ -77,10 +76,10 @@ export default defineComponent({
             { name: 'haste', bonuses: [ { attackMod: 1, extraAttacks: 1 } ] },
           ],
           selfBuffs : [
-            { name: 'rage', bonuses: [ { str: 4, type: 'morale' } ] }
+            { name: 'rage', bonuses: [ { str: 4, type: 'morale' } ] },
+            { name: 'power attack', bonuses: [ { meleeAttack: -2, damage1h: +4, damage2h: +6  } ] },
           ],
           conditionals: [
-            { name: 'power attack', bonuses: [ { meleeAttack: -2, damage1h: +4, damage2h: +6  } ] },
             { name: 'flanking', bonuses: [ { meleeAttack: 2 }]},
             { name: 'robot slayer', bonuses: [ { attackMod: 1, type: 'trait' }]},
           ]
@@ -127,30 +126,40 @@ export default defineComponent({
       }
     },
     attackBuffs() {
+      let buffs = [];
+      buffs.push(this.getBuffs('attackMod'));
+      if (this.selectedAttack.type == 'melee1h' || this.selectedAttack.type == 'melee2h') {
+        buffs.push(this.getBuffs('meleeAttack'));
+      }
+
       let attackString = '';
       if (this.selectedAttack.enhAttack) {
         attackString += `+${this.selectedAttack.enhAttack}[enh]`;
       }
-      attackString += this.parseBuff('attackMod');
-      if (this.selectedAttack.type == 'melee1h' || this.selectedAttack.type == 'melee2h') {
-        attackString += this.parseBuff('meleeAttack');
-      }
+      buffs.flat().sort(this.compareBuffValues).forEach((buff) => attackString += this.parseBuff(buff));
+
       return attackString;
     },
     damageBuffs() {
-      let attackString = '';
-      if (this.selectedAttack.enhDamage) {
-        attackString += `+${this.selectedAttack.enhDamage}[enh]`;
-      }
-      attackString += this.parseBuff('damageMod');
+      let buffs = [];
+      buffs.push(this.getBuffs('damageMod'));
+
       if (this.selectedAttack.type == 'melee1h') {
-        attackString += this.parseBuff('damageMelee');
-        attackString += this.parseBuff('damage1h');
+        buffs.push(this.getBuffs('damageMelee'));
+        buffs.push(this.getBuffs('damage1h'));
       } else if (this.selectedAttack.type == 'melee2h') {
-        attackString += this.parseBuff('damageMelee');
-        attackString += this.parseBuff('damage2h');
+        buffs.push(this.getBuffs('damageMelee'));
+        buffs.push(this.getBuffs('damage2h'));
       }
-      return attackString;
+
+      let damageString = '';
+      if (this.selectedAttack.enhDamage) {
+        damageString += `+${this.selectedAttack.enhDamage}[enh]`;
+      }
+
+      buffs.flat().sort(this.compareBuffValues).forEach((buff) => damageString += this.parseBuff(buff));
+
+      return damageString;
     },
     baseAttacks() {
       var attackRange = [];
@@ -197,7 +206,7 @@ export default defineComponent({
         } else if (extraAttack.value > 1) {
           for (var i = 0; i < extraAttack.value; i++) {
             fullAttacks.push({
-              name: extraAttack.name + ' ' + (i+1),
+              name: extraAttack.name + ' ' + (i+1),fullAttack
               value: this.fullAttack(this.baseAttacks[0])
             });
           }
@@ -236,6 +245,16 @@ export default defineComponent({
       return { toast }
     },
   methods: {
+      compareBuffValues(a, b) {
+          return b.value - a.value;
+      },
+      getBuffs(buffName) {
+        if (!this.combinedBuffs || !this.combinedBuffs[buffName]) {
+          return [];
+        } else {
+          return this.combinedBuffs[buffName];
+        }
+      },
       fullAttack(baseAttack) {
         var dieRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
           ? `d20cs>${this.selectedAttack.crit}`
@@ -243,16 +262,12 @@ export default defineComponent({
         var attack = `${dieRoll}+${baseAttack}[base]+${this.attackStatBonus}[${this.selectedAttack.stat}]${this.attackBuffs}`
         return `[[ ${attack} ]]`;
       },
-      parseBuff(buffName) {
-        let attackString = '';
-        if (this.combinedBuffs.hasOwnProperty(buffName)) {
-          for (var buffIndex in this.combinedBuffs[buffName]) {
-            let buff = this.combinedBuffs[buffName][buffIndex];
-            let sign = buff.value >=0 ? '+' : '';
-            attackString += ` ${sign}${buff.value}[${buff.name}${buff.type ? (' '+ buff.type) : ''}]`;
-          }
+      parseBuff(buff) {
+        if (!buff) {
+          return '';
         }
-        return attackString;
+        let sign = buff.value >=0 ? '+' : '';
+        return ` ${sign}${buff.value}[${buff.name}${buff.type ? (' '+ buff.type) : ''}]`;
       },
       selectFirstAttack() {
         this.selectedAttack = (this.selectedCharacter && this.selectedCharacter.attacks)

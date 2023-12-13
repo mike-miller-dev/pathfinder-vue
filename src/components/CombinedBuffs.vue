@@ -38,6 +38,7 @@
       combinedBonuses() {
   
         let combined = {};
+
         for (var buffIndex in this.allBonuses) {
           let buff = this.allBonuses[buffIndex];
           //example buff: { name: 'bulls strength', selected: true, bonuses: [{ strength: 4, type: 'enh'}] }
