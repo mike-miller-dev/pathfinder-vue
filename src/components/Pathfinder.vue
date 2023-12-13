@@ -16,11 +16,11 @@
             {{ attack.name }}
           </option>
         </select>
+        <br />
+        <br />
 
-        <div>
-          <input type="checkbox" key="isSingleAttack" id="isSingleAttack" name="isSingleAttack" v-model="isSingleAttack">
-          <label for="isSingleAttack">Single Attack</label>
-        </div>
+        <Slider :value="isFullAttack" @changed="isFullAttack = $event" />
+        <br />
         <br />
 
         <div v-if="fullAttackMacro">
@@ -39,17 +39,19 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import CombinedBuffs from './CombinedBuffs.vue';
+import Slider from './Slider.vue';
 export default defineComponent({
   name: 'Pathfinder',
   components: {
-    CombinedBuffs
-  },
+    CombinedBuffs,
+    Slider
+},
   data() {
     return {
       selectedCharacter: null,
       selectedAttack: null,
       combinedBuffs: [],
-      isSingleAttack: false,
+      isFullAttack: true,
       characters : [
         {
           name: 'Deebo',
@@ -181,7 +183,7 @@ export default defineComponent({
         value: this.fullAttack(this.baseAttacks[0])
       });
 
-      if (this.isSingleAttack) {
+      if (!this.isFullAttack) {
         return fullAttacks;
       }
 
