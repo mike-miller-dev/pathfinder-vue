@@ -8,7 +8,7 @@
     </select>
 
     <div v-if="selectedCharacter">
-      <CombinedBuffs :character="selectedCharacter" @changed="combinedBuffs = $event"/>
+      <CombinedBuffs :character="selectedCharacter" :selected-attack="selectedAttack" @changed="combinedBuffs = $event" />
 
       <div>
         <select v-model="selectedAttack">
@@ -126,38 +126,24 @@ export default defineComponent({
       }
     },
     attackBuffs() {
-      let buffs = [];
-      buffs.push(this.getBuffs('attackMod'));
-      if (this.selectedAttack.type == 'melee1h' || this.selectedAttack.type == 'melee2h') {
-        buffs.push(this.getBuffs('meleeAttack'));
-      }
-
       let attackString = '';
       if (this.selectedAttack.enhAttack) {
         attackString += `+${this.selectedAttack.enhAttack}[enh]`;
       }
-      buffs.flat().sort(this.compareBuffValues).forEach((buff) => attackString += this.parseBuff(buff));
+
+      let buffs = this.getBuffs('attackMod');
+      buffs.sort(this.compareBuffValues).forEach((buff) => attackString += this.parseBuff(buff));
 
       return attackString;
     },
     damageBuffs() {
-      let buffs = [];
-      buffs.push(this.getBuffs('damageMod'));
-
-      if (this.selectedAttack.type == 'melee1h') {
-        buffs.push(this.getBuffs('damageMelee'));
-        buffs.push(this.getBuffs('damage1h'));
-      } else if (this.selectedAttack.type == 'melee2h') {
-        buffs.push(this.getBuffs('damageMelee'));
-        buffs.push(this.getBuffs('damage2h'));
-      }
-
       let damageString = '';
       if (this.selectedAttack.enhDamage) {
         damageString += `+${this.selectedAttack.enhDamage}[enh]`;
       }
 
-      buffs.flat().sort(this.compareBuffValues).forEach((buff) => damageString += this.parseBuff(buff));
+      let buffs = this.getBuffs('damageMod');
+      buffs.sort(this.compareBuffValues).forEach((buff) => damageString += this.parseBuff(buff));
 
       return damageString;
     },
@@ -252,7 +238,7 @@ export default defineComponent({
         if (!this.combinedBuffs || !this.combinedBuffs[buffName]) {
           return [];
         } else {
-          return this.combinedBuffs[buffName];
+          return this.combinedBuffs[buffName].flat();
         }
       },
       fullAttack(baseAttack) {

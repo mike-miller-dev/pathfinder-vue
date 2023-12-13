@@ -22,7 +22,11 @@
       character : {
         type: Object,
         required: true
-      }
+      },
+      selectedAttack : {
+        type: Object,
+        required: true
+      },
     },
     data() {
       return {
@@ -34,6 +38,9 @@
     computed: {
       allBonuses() {
         return this.selectedSelfBuffs.concat(this.selectedConditionals, this.selectedPartyBuffs);
+      },
+      isMeleeAttack() {
+        return this.selectedAttack.type.includes('melee');
       },
       combinedBonuses() {
   
@@ -51,15 +58,36 @@
               if (bonusField == 'type') {
                 continue;
               }
+
+              let combinedType = bonusField;
+              if (combinedType == 'damage1h' || combinedType == 'damage2h' || combinedType == 'meleeDamage') {
+                if ((combinedType == 'damage1h' && this.selectedAttack.type == 'melee1h')
+                  || (combinedType == 'damage2h' && this.selectedAttack.type == 'melee2h')
+                  || (combinedType == 'meleeDamage')) {
+                  combinedType = 'damageMod';
+                } else {
+                  continue;
+                }
+              }
+
+              if (combinedType == 'meleeAttack') {
+                if (this.isMeleeAttack) {
+                  combinedType = 'attackMod';
+                } else {
+                  continue;
+                }
+              }
+
+
               let propertyValue = bonus[bonusField];
               //example propertyValue: 4
               
-              if (combined.hasOwnProperty(bonusField)) {
-                let existingBuffs = combined[bonusField];
+              if (combined.hasOwnProperty(combinedType)) {
+                let existingBuffs = combined[combinedType];
                 let existingIndex = existingBuffs.findIndex(existingBuff => bonus.type && existingBuff.type === bonus.type);
                 if (existingIndex < 0) {
                   //add a new type to the existing buffs
-                  combined[bonusField].push({
+                  combined[combinedType].push({
                     'name': buff.name,
                     'value': propertyValue,
                     'type': bonus.type
@@ -68,7 +96,7 @@
                   let existingSameTypeBuff = existingBuffs[existingIndex];
                   if (this.isLarger(existingSameTypeBuff.value, propertyValue)) {
                     //replace with the newer larger buff
-                    combined[bonusField][existingIndex] = {
+                    combined[combinedType][existingIndex] = {
                       'name': buff.name,
                       'value': propertyValue,
                       'type': bonus.type
@@ -77,7 +105,7 @@
                 }
               } else {
                 //push a new type with the new buff
-                combined[bonusField] = [{
+                combined[combinedType] = [{
                   'name': buff.name,
                   'value': propertyValue,
                   'type': bonus.type
