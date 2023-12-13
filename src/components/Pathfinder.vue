@@ -23,10 +23,9 @@
         <br />
         <br />
 
-        <div v-if="fullAttackMacro">
+        <div class="macro" v-if="fullAttackMacro" @click="copy">
           {{fullAttackMacro}}
         </div>
-
         
       </div>
     </div>
@@ -250,11 +249,22 @@ export default defineComponent({
         this.selectedAttack = (this.selectedCharacter && this.selectedCharacter.attacks)
           ? this.selectedCharacter.attacks[0]
           : null;
-      }
+      },
+      copy() {
+        const clipboardData =
+          event.clipboardData ||
+          window.clipboardData ||
+          event.originalEvent?.clipboardData ||
+          navigator.clipboard;
+
+        clipboardData.writeText(this.fullAttackMacro);
+      },
     },
 });
 </script>
 
 <style scoped>
-
+  .macro:hover {
+    cursor: pointer;
+}
 </style>
