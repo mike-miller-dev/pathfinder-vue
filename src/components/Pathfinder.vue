@@ -57,9 +57,9 @@ export default defineComponent({
           str: 19,
           attacks: [
             { name: 'MW Nodachi', stat:'str', type: 'melee2h', enhAttack: 1, damageDice: 'd10', crit: 18},
-            { name: 'bardiche', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
-            { name: 'heavy flail', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
-            { name: 'unarmed', stat:'str', type: 'melee1h', damageDice: '1d6' },
+            { name: 'Bardiche', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
+            { name: 'Heavy Flail', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
+            { name: 'Claws', stat:'str', type: 'melee1h', damageDice: '1d6', attacks: 2 },
           ],
           bigUps: [
             { name: 'none', large: false},
@@ -159,9 +159,17 @@ export default defineComponent({
       //first attack
       attackRange.push(this.selectedCharacter.baseAttack);
 
-      for (var iterativeAttack = (this.selectedCharacter.baseAttack-5); iterativeAttack > 0; iterativeAttack -= 5) {
-        attackRange.push(iterativeAttack);
+      // use fixed number for natural attacks
+      if (this.selectedAttack && this.selectedAttack.attacks) {
+        for (var i = 1; i < this.selectedAttack.attacks; i++) {
+          attackRange.push(this.selectedCharacter.baseAttack);
+        }
+      } else {
+        for (var iterativeAttack = (this.selectedCharacter.baseAttack-5); iterativeAttack > 0; iterativeAttack -= 5) {
+          attackRange.push(iterativeAttack);
+        }
       }
+
       return attackRange;
     },
     fullAttacks() {
