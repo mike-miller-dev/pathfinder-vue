@@ -241,7 +241,7 @@ export default defineComponent({
           for (var buffIndex in this.combinedBuffs[buffName]) {
             let buff = this.combinedBuffs[buffName][buffIndex];
             let sign = buff.value >=0 ? '+' : '';
-            attackString += `${sign}${buff.value}[${buff.name}${buff.type ? (' '+ buff.type) : ''}]`;
+            attackString += ` ${sign}${buff.value}[${buff.name}${buff.type ? (' '+ buff.type) : ''}]`;
           }
         }
         return attackString;
