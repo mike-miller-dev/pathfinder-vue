@@ -23,7 +23,7 @@
         <br />
         <br />
 
-        <div class="macro" v-if="fullAttackMacro" @click="copy">
+        <div class="macro" v-if="fullAttackMacro" @click="copyToClipboard">
           {{fullAttackMacro}}
         </div>
         
@@ -36,6 +36,7 @@
 </template>
 
 <script lang="ts">
+import { useToast } from "vue-toastification";
 import { defineComponent } from 'vue'
 import CombinedBuffs from './CombinedBuffs.vue';
 import Slider from './Slider.vue';
@@ -226,6 +227,14 @@ export default defineComponent({
       return macro;
     }
   },
+  setup() {
+      // Get toast interface
+      const toast = useToast();
+      // These options will override the options defined in the "app.use" plugin registration for this specific toast
+
+      // Make it available inside methods
+      return { toast }
+    },
   methods: {
       fullAttack(baseAttack) {
         var dieRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
@@ -250,7 +259,7 @@ export default defineComponent({
           ? this.selectedCharacter.attacks[0]
           : null;
       },
-      copy() {
+      copyToClipboard() {
         const clipboardData =
           event.clipboardData ||
           window.clipboardData ||
@@ -258,6 +267,20 @@ export default defineComponent({
           navigator.clipboard;
 
         clipboardData.writeText(this.fullAttackMacro);
+
+        this.toast.info("Copied to Clipboard", {
+          position: "top-right",
+          timeout: 1000,
+          closeOnClick: true,
+          pauseOnFocusLoss: false,
+          pauseOnHover: false,
+          draggable: false,
+          showCloseButtonOnHover: false,
+          hideProgressBar: true,
+          closeButton: "button",
+          icon: true,
+          rtl: false
+        });
       },
     },
 });
