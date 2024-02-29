@@ -120,16 +120,13 @@
     },
     
     watch: {
-      combinedBonuses: function (newVal, oldVal) {
+      combinedBonuses: function (newVal) {
         this.$emit('changed', newVal);
       }
     },
     methods: {
-      isLarger(oldVal, newVal) {
-        return this.isNumber(oldVal) && this.isNumber(newVal) && newVal > oldVal
-      },
-      isNumber(value) {
-        return typeof value === 'number' && isFinite(value);
+      isLarger(oldVal: Number, newVal: Number) {
+        return newVal > oldVal
       },
     },
   });

@@ -229,7 +229,7 @@ export default defineComponent({
         attackBonus += this.selectedAttack.enhAttack;
       }
       let attackBuffs = this.getBuffs('attackMod');
-      attackBuffs.forEach((buff) => {
+      attackBuffs.forEach(buff => {
         attackBonus += buff.value
       });
       return `${attackRoll}+${attackBonus}`;
@@ -241,7 +241,7 @@ export default defineComponent({
         damageBonus += this.selectedAttack.enhDamage;
       }
       let damageBuffs = this.getBuffs('damageMod');
-      damageBuffs.forEach((buff) => {
+      damageBuffs.forEach(buff => {
         damageBonus += buff.value
       });
       return `${damageRoll}+${damageBonus}`;
@@ -269,7 +269,7 @@ export default defineComponent({
           return this.combinedBuffs[buffName].flat();
         }
       },
-      fullAttack(baseAttack) {
+      fullAttack(baseAttack: Number) {
         var dieRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
           ? `d20cs>${this.selectedAttack.crit}`
           : 'd20';

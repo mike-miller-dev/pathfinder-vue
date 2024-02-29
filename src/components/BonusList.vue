@@ -22,7 +22,7 @@ export default defineComponent({
     }
   },  
   watch: {
-    selectedBuffs: function (newVal, oldVal) {
+    selectedBuffs: function (newVal) {
       this.$emit('changed', newVal);
     }
   },
