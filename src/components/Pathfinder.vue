@@ -8,6 +8,7 @@
     </select>
 
     <div v-if="selectedCharacter">
+
       <CombinedBuffs :character="selectedCharacter" :selected-attack="selectedAttack" @changed="combinedBuffs = $event" />
 
       <div>
@@ -20,6 +21,10 @@
         <br />
 
         <Slider :value="isFullAttack" @changed="isFullAttack = $event" />
+        <br />
+        <br />
+
+        {{ simpleAttack }}
         <br />
         <br />
 
@@ -62,14 +67,6 @@ export default defineComponent({
             { name: 'Heavy Flail', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Claws', stat:'str', type: 'melee1h', damageDice: '1d6', attacks: 2 },
           ],
-          bigUps: [
-            { name: 'none', large: false},
-            { name: 'enlarge', large: true}
-          ],
-          seperateAttacks: [
-            { name: 'none', selected: true},
-            { name: 'opp attack', type: 'melee', attackMod: 4, selected: false},
-          ],
           partyBuffs : [
             {  name: 'flagbearer',  bonuses: [ { attackMod: 1, damageMod: 1, fearSave:1, charmSave: 1, type: 'morale' } ] },
             {  name: 'inspire courage',  bonuses: [ { attackMod: 1, damageMod: 1, type: 'competence' } ] },
@@ -77,6 +74,7 @@ export default defineComponent({
           ],
           selfBuffs : [
             { name: 'rage', bonuses: [ { str: 4, type: 'morale' } ] },
+            { name: 'charge', bonuses: [ { meleeAttack: 1 } ] },
             { name: 'power attack', bonuses: [ { meleeAttack: -2, damage1h: +4, damage2h: +6  } ] },
           ],
           conditionals: [
@@ -220,7 +218,37 @@ export default defineComponent({
         macro += `{{ ${ attack.name }=${ attack.value } for ${ this.fullDamage }}}`;
       }
       return macro;
-    }
+    },
+    simpleAttackRoll() {
+      var baseAttack = this.baseAttacks[0];
+      var attackRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
+        ? `d20cs>${this.selectedAttack.crit}`
+        : 'd20';
+      var attackBonus = baseAttack + this.attackStatBonus;
+      if (this.selectedAttack.enhAttack) {
+        attackBonus += this.selectedAttack.enhAttack;
+      }
+      let attackBuffs = this.getBuffs('attackMod');
+      attackBuffs.forEach((buff) => {
+        attackBonus += buff.value
+      });
+      return `${attackRoll}+${attackBonus}`;
+    },
+    simpleDamageRoll() {
+      var damageRoll = this.selectedAttack.damageDice;
+      var damageBonus = this.damageStatBonus;
+      if (this.selectedAttack.enhDamage) {
+        damageBonus += this.selectedAttack.enhDamage;
+      }
+      let damageBuffs = this.getBuffs('damageMod');
+      damageBuffs.forEach((buff) => {
+        damageBonus += buff.value
+      });
+      return `${damageRoll}+${damageBonus}`;
+    },
+    simpleAttack() {
+      return `${this.simpleAttackRoll} for ${this.simpleDamageRoll}`;
+    },
   },
   setup() {
       // Get toast interface
