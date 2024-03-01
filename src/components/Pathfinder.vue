@@ -44,6 +44,10 @@ import { useToast } from "vue-toastification";
 import { defineComponent } from 'vue'
 import CombinedBuffs from './CombinedBuffs.vue';
 import Slider from './Slider.vue';
+import type { Buff } from "@/models/Buff";
+import type { Character } from "@/models/Character";
+import type { CharacterAttack } from "@/models/CharacterAttack";
+import type { IterativeAttack } from "@/models/IterativeAttack";
 export default defineComponent({
   name: 'Pathfinder',
   components: {
@@ -61,28 +65,29 @@ export default defineComponent({
           name: 'Deebo',
           baseAttack: 4,
           str: 19,
-          attacks: [
+          attacks:  [
             { name: 'MW Nodachi', stat:'str', type: 'melee2h', enhAttack: 1, damageDice: 'd10', crit: 18},
             { name: 'Bardiche', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Heavy Flail', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Claws', stat:'str', type: 'melee1h', damageDice: '1d6', attacks: 2 },
-          ],
+          ] as Array<CharacterAttack>,
           partyBuffs : [
             {  name: 'flagbearer',  bonuses: [ { attackMod: 1, damageMod: 1, fearSave:1, charmSave: 1, type: 'morale' } ] },
             {  name: 'inspire courage',  bonuses: [ { attackMod: 1, damageMod: 1, type: 'competence' } ] },
             { name: 'haste', bonuses: [ { attackMod: 1, extraAttacks: 1 } ] },
-          ],
+          ] as Array<Buff>,
           selfBuffs : [
             { name: 'rage', bonuses: [ { str: 4, type: 'morale' } ] },
-            { name: 'charge', bonuses: [ { meleeAttack: 1 } ] },
             { name: 'power attack', bonuses: [ { meleeAttack: -2, damage1h: +4, damage2h: +6  } ] },
-          ],
+            { name: 'fighting defensively', bonuses: [ { meleeAttack: -4  } ] },
+          ] as Array<Buff>,
           conditionals: [
+            { name: 'charge', bonuses: [ { meleeAttack: 1 } ] },
             { name: 'flanking', bonuses: [ { meleeAttack: 2 }]},
             { name: 'robot slayer', bonuses: [ { attackMod: 1, type: 'trait' }]},
-          ]
+          ] as Array<Buff>,
         },
-      ],
+      ] as Array<Character>,
     };
   },
   mounted() {
@@ -146,7 +151,7 @@ export default defineComponent({
       return damageString;
     },
     baseAttacks() {
-      var attackRange = [];
+      var attackRange: Array<number> = [];
     
       if (!this.selectedCharacter) {
         return attackRange;
@@ -168,7 +173,7 @@ export default defineComponent({
       return attackRange;
     },
     fullAttacks() {
-      var fullAttacks = [];
+      var fullAttacks: Array<IterativeAttack> = [];
 
       //first attack
       fullAttacks.push({
@@ -251,18 +256,16 @@ export default defineComponent({
     },
   },
   setup() {
-      // Get toast interface
       const toast = useToast();
-      // These options will override the options defined in the "app.use" plugin registration for this specific toast
 
       // Make it available inside methods
       return { toast }
-    },
+  },
   methods: {
       compareBuffValues(a, b) {
           return b.value - a.value;
       },
-      getBuffs(buffName) {
+      getBuffs(buffName: string) {
         if (!this.combinedBuffs || !this.combinedBuffs[buffName]) {
           return [];
         } else {

@@ -29,3 +29,8 @@ export default defineComponent({
 });
 
 </script>
+<style scoped>
+  input {
+    margin-right: 3px;
+}
+</style>
