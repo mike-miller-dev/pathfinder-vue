@@ -11,4 +11,6 @@ export interface Bonus {
 
     fearSave: Number;
     charmSave: Number;
+
+    damageDice: string
 };

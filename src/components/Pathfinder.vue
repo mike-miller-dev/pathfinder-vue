@@ -63,12 +63,13 @@ export default defineComponent({
       characters : [
         {
           name: 'Deebo',
-          baseAttack: 4,
+          baseAttack: 5,
           str: 19,
           attacks:  [
-            { name: 'MW Nodachi', stat:'str', type: 'melee2h', enhAttack: 1, damageDice: 'd10', crit: 18},
+            { name: 'Adamantine Nodachi', stat:'str', type: 'melee2h', enhAttack: 1, damageDice: 'd10', crit: 18},
             { name: 'Bardiche', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Heavy Flail', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
+            { name: 'Kukri', stat:'str', type: 'melee1h', damageDice: '1d4', enhAttack: 1, crit: 18 },
             { name: 'Claws', stat:'str', type: 'melee1h', damageDice: '1d6', attacks: 2 },
           ] as Array<CharacterAttack>,
           partyBuffs : [
@@ -80,6 +81,7 @@ export default defineComponent({
             { name: 'rage', bonuses: [ { str: 4, type: 'morale' } ] },
             { name: 'power attack', bonuses: [ { meleeAttack: -2, damage1h: +4, damage2h: +6  } ] },
             { name: 'fighting defensively', bonuses: [ { meleeAttack: -4  } ] },
+			{ name: 'elemental blood', bonuses: [ { damageDice: '+1d6', type: 'electricity' } ] }
           ] as Array<Buff>,
           conditionals: [
             { name: 'charge', bonuses: [ { meleeAttack: 1 } ] },
@@ -147,6 +149,9 @@ export default defineComponent({
 
       let buffs = this.getBuffs('damageMod');
       buffs.sort(this.compareBuffValues).forEach((buff) => damageString += this.parseBuff(buff));
+
+      let damageDice = this.getBuffs('damageDice');
+      damageDice.forEach((buff) => damageString += this.parseBuff(buff));
 
       return damageString;
     },
@@ -249,7 +254,12 @@ export default defineComponent({
       damageBuffs.forEach(buff => {
         damageBonus += buff.value
       });
-      return `${damageRoll}+${damageBonus}`;
+
+      let extraDamageString = '';
+      let damageDice = this.getBuffs('damageDice');
+      damageDice.forEach((buff) => extraDamageString += buff.value);
+
+      return `${damageRoll}+${damageBonus}${extraDamageString}`;
     },
     simpleAttack() {
       return `${this.simpleAttackRoll} for ${this.simpleDamageRoll}`;
