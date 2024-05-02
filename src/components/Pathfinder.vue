@@ -80,13 +80,13 @@ export default defineComponent({
           selfBuffs : [
             { name: 'rage', bonuses: [ { str: 4, type: 'morale' } ] },
             { name: 'power attack', bonuses: [ { meleeAttack: -2, damage1h: +4, damage2h: +6  } ] },
-            { name: 'fighting defensively', bonuses: [ { meleeAttack: -4  } ] },
-			{ name: 'elemental blood', bonuses: [ { damageDice: '+1d6', type: 'electricity' } ] }
+            { name: 'robot slayer', bonuses: [ { attackMod: 1, type: 'trait' }]},
+            { name: 'elemental blood', bonuses: [ { damageDice: '+1d6', type: 'electricity' } ] }
           ] as Array<Buff>,
           conditionals: [
             { name: 'charge', bonuses: [ { meleeAttack: 1 } ] },
             { name: 'flanking', bonuses: [ { meleeAttack: 2 }]},
-            { name: 'robot slayer', bonuses: [ { attackMod: 1, type: 'trait' }]},
+            { name: 'fighting defensively', bonuses: [ { meleeAttack: -4  } ] },
           ] as Array<Buff>,
         },
       ] as Array<Character>,
