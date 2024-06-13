@@ -66,10 +66,10 @@ export default defineComponent({
           baseAttack: 5,
           str: 19,
           attacks:  [
-            { name: 'Adamantine Nodachi', stat:'str', type: 'melee2h', enhAttack: 1, damageDice: 'd10', crit: 18},
+            { name: 'Adamantine Nodachi +1', stat:'str', type: 'melee2h', enhAttack: 1, enhDamage: 1, damageDice: 'd10', crit: 18},
             { name: 'Bardiche', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Heavy Flail', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
-            { name: 'Kukri', stat:'str', type: 'melee1h', damageDice: '1d4', enhAttack: 1, crit: 18 },
+            { name: 'Kukri', stat:'str', type: 'melee1h', damageDice: '1d4', crit: 18 },
             { name: 'Claws', stat:'str', type: 'melee1h', damageDice: '1d6', attacks: 2 },
           ] as Array<CharacterAttack>,
           partyBuffs : [
