@@ -7,16 +7,20 @@
         -------------------
         <BonusList :bonuses="character.conditionals" @changed="this.selectedConditionals = $event" />
         -------------------
+        <TemporaryBonuses @changed="this.temporaryBuffs = $event" />
+        -------------------
     </div>
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue'
   import BonusList from './BonusList.vue';
+import TemporaryBonuses from './TemporaryBonuses.vue';
   export default defineComponent({
     name: 'CombinedBuffs',
     emits: ["changed"],
     components: {
-      BonusList
+      BonusList,
+      TemporaryBonuses
     },
     props : {
       character : {
@@ -32,12 +36,13 @@
       return {
         selectedSelfBuffs: [],
         selectedPartyBuffs: [],
-        selectedConditionals: []
+        selectedConditionals: [],
+        temporaryBuffs: []
       }
     },
     computed: {
       allBonuses() {
-        return this.selectedSelfBuffs.concat(this.selectedConditionals, this.selectedPartyBuffs);
+        return this.selectedSelfBuffs.concat(this.selectedConditionals, this.selectedPartyBuffs, this.temporaryBuffs);
       },
       isMeleeAttack() {
         return this.selectedAttack.type.includes('melee');
