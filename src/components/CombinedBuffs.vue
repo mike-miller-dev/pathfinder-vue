@@ -14,7 +14,7 @@
 <script lang="ts">
   import { defineComponent } from 'vue'
   import BonusList from './BonusList.vue';
-import TemporaryBonuses from './TemporaryBonuses.vue';
+  import TemporaryBonuses from './TemporaryBonuses.vue';
   export default defineComponent({
     name: 'CombinedBuffs',
     emits: ["changed"],
@@ -41,14 +41,18 @@ import TemporaryBonuses from './TemporaryBonuses.vue';
       }
     },
     computed: {
+      weaponBonuses() {
+        return {
+          bonuses: this.selectedAttack.bonuses
+        };
+      },
       allBonuses() {
-        return this.selectedSelfBuffs.concat(this.selectedConditionals, this.selectedPartyBuffs, this.temporaryBuffs);
+        return this.selectedSelfBuffs.concat(this.selectedConditionals, this.selectedPartyBuffs, this.temporaryBuffs, this.weaponBonuses);
       },
       isMeleeAttack() {
         return this.selectedAttack.type.includes('melee');
       },
       combinedBonuses() {
-  
         let combined = {};
 
         for (var buffIndex in this.allBonuses) {
@@ -119,15 +123,19 @@ import TemporaryBonuses from './TemporaryBonuses.vue';
             }
           }
         }
-  
         return combined;
       }
     },
-    
+    async mounted() {
+      if (this.combinedBonuses) {
+        //trigger initial emit using permanent weapon buffs, before any button is clicked
+        this.$emit('changed', this.combinedBonuses)
+      }
+    },
     watch: {
       combinedBonuses: function (newVal) {
         this.$emit('changed', newVal);
-      }
+      },
     },
     methods: {
       isLarger(oldVal: Number, newVal: Number) {

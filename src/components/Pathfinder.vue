@@ -66,7 +66,7 @@ export default defineComponent({
           baseAttack: 5,
           str: 19,
           attacks:  [
-            { name: 'Adamantine Nodachi +1', stat:'str', type: 'melee2h', enhAttack: 1, enhDamage: 1, damageDice: 'd10', crit: 18},
+            { name: 'Adamantine Nodachi +1', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 18, bonuses: [ { attackMod: 1, type: 'enh' }, { damageMod: 1, type: 'enh' } ]},
             { name: 'Bardiche', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Heavy Flail', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Kukri', stat:'str', type: 'melee1h', damageDice: '1d4', crit: 18 },
@@ -132,9 +132,6 @@ export default defineComponent({
     },
     attackBuffs() {
       let attackString = '';
-      if (this.selectedAttack.enhAttack) {
-        attackString += `+${this.selectedAttack.enhAttack}[enh]`;
-      }
 
       let buffs = this.getBuffs('attackMod');
       buffs.sort(this.compareBuffValues).forEach((buff: Buff) => attackString += this.parseBuff(buff));
@@ -143,9 +140,6 @@ export default defineComponent({
     },
     damageBuffs() {
       let damageString = '';
-      if (this.selectedAttack.enhDamage) {
-        damageString += `+${this.selectedAttack.enhDamage}[enh]`;
-      }
 
       let buffs = this.getBuffs('damageMod');
       buffs.sort(this.compareBuffValues).forEach((buff: Buff) => damageString += this.parseBuff(buff));
@@ -235,9 +229,7 @@ export default defineComponent({
         ? `d20cs>${this.selectedAttack.crit}`
         : 'd20';
       var attackBonus = baseAttack + this.attackStatBonus;
-      if (this.selectedAttack.enhAttack) {
-        attackBonus += this.selectedAttack.enhAttack;
-      }
+
       let attackBuffs = this.getBuffs('attackMod');
       attackBuffs.forEach((buff: Buff) => {
         attackBonus += buff.value
@@ -247,9 +239,7 @@ export default defineComponent({
     simpleDamageRoll() {
       var damageRoll = this.selectedAttack.damageDice;
       var damageBonus = this.damageStatBonus;
-      if (this.selectedAttack.enhDamage) {
-        damageBonus += this.selectedAttack.enhDamage;
-      }
+
       let damageBuffs = this.getBuffs('damageMod');
       damageBuffs.forEach((buff: Buff) => {
         damageBonus += buff.value
@@ -294,7 +284,7 @@ export default defineComponent({
           return '';
         }
         let sign = buff.value >= 0 ? '+' : '';
-        return ` ${sign}${buff.value}[${buff.name}${buff.type ? (' '+ buff.type) : ''}]`;
+        return ` ${sign}${buff.value}[${buff.name ? buff.name : ''}${buff.type ? ((buff.name?' ':'')+ buff.type) : ''}]`;
       },
       selectFirstAttack() {
         this.selectedAttack = (this.selectedCharacter && this.selectedCharacter.attacks)
