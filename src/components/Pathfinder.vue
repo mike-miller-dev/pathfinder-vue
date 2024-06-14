@@ -137,7 +137,7 @@ export default defineComponent({
       }
 
       let buffs = this.getBuffs('attackMod');
-      buffs.sort(this.compareBuffValues).forEach((buff) => attackString += this.parseBuff(buff));
+      buffs.sort(this.compareBuffValues).forEach((buff: Buff) => attackString += this.parseBuff(buff));
 
       return attackString;
     },
@@ -148,10 +148,10 @@ export default defineComponent({
       }
 
       let buffs = this.getBuffs('damageMod');
-      buffs.sort(this.compareBuffValues).forEach((buff) => damageString += this.parseBuff(buff));
+      buffs.sort(this.compareBuffValues).forEach((buff: Buff) => damageString += this.parseBuff(buff));
 
       let damageDice = this.getBuffs('damageDice');
-      damageDice.forEach((buff) => damageString += this.parseBuff(buff));
+      damageDice.forEach((buff: Buff) => damageString += this.parseBuff(buff));
 
       return damageString;
     },
@@ -239,7 +239,7 @@ export default defineComponent({
         attackBonus += this.selectedAttack.enhAttack;
       }
       let attackBuffs = this.getBuffs('attackMod');
-      attackBuffs.forEach(buff => {
+      attackBuffs.forEach((buff: Buff) => {
         attackBonus += buff.value
       });
       return `${attackRoll}+${attackBonus}`;
@@ -251,13 +251,13 @@ export default defineComponent({
         damageBonus += this.selectedAttack.enhDamage;
       }
       let damageBuffs = this.getBuffs('damageMod');
-      damageBuffs.forEach(buff => {
+      damageBuffs.forEach((buff: Buff) => {
         damageBonus += buff.value
       });
 
       let extraDamageString = '';
       let damageDice = this.getBuffs('damageDice');
-      damageDice.forEach((buff) => extraDamageString += buff.value);
+      damageDice.forEach((buff: Buff) => extraDamageString += buff.value);
 
       return `${damageRoll}+${damageBonus}${extraDamageString}`;
     },
@@ -272,7 +272,7 @@ export default defineComponent({
       return { toast }
   },
   methods: {
-      compareBuffValues(a, b) {
+      compareBuffValues(a: Buff, b: Buff) {
           return b.value - a.value;
       },
       getBuffs(buffName: string) {
@@ -289,11 +289,11 @@ export default defineComponent({
         var attack = `${dieRoll}+${baseAttack}[base]+${this.attackStatBonus}[${this.selectedAttack.stat}]${this.attackBuffs}`
         return `[[ ${attack} ]]`;
       },
-      parseBuff(buff) {
+      parseBuff(buff: Buff) {
         if (!buff) {
           return '';
         }
-        let sign = buff.value >=0 ? '+' : '';
+        let sign = buff.value >= 0 ? '+' : '';
         return ` ${sign}${buff.value}[${buff.name}${buff.type ? (' '+ buff.type) : ''}]`;
       },
       selectFirstAttack() {
