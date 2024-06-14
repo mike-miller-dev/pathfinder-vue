@@ -2,6 +2,7 @@
     <div>
         <h4>Temporary Bonuses</h4>
         <div v-for="(bonus, index) in bonuses">
+            <input type="checkbox" v-model="bonus.active">
             <input type="text" v-model="bonus.value" placeholder="Value">
             <select v-model="bonus.appliesTo">
                 <option v-for="option in options" :value="option">
@@ -43,6 +44,7 @@
             return {
                 name: "temporary",
                 bonuses: this.bonuses
+                .filter(b => b.active)
                 .filter(b => b.value != null)
                 .filter(b => b.appliesTo != null)
                 .map(b => {
@@ -57,6 +59,7 @@
     methods: {
         addRow() {
             this.bonuses.push({
+                active: true,
                 value: null,
                 appliesTo: null,
                 type: null
