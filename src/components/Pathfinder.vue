@@ -187,7 +187,7 @@ export default defineComponent({
       //first attack
       fullAttacks.push({
         name: 'attack' + (this.baseAttacks.length > 1 ? ' 1' : ''),
-        value: this.fullAttack(this.baseAttacks[0])
+        value: this.baseAttacks[0]
       });
 
       for (var extraAttackIndex in this.extraAttacks) {
@@ -195,13 +195,13 @@ export default defineComponent({
         if (extraAttack.value == 1) {
           fullAttacks.push({
             name: extraAttack.name,
-            value: this.fullAttack(this.baseAttacks[0])
+            value: this.baseAttacks[0]
           });
         } else if (extraAttack.value > 1) {
           for (var i = 0; i < extraAttack.value; i++) {
             fullAttacks.push({
               name: extraAttack.name + ' ' + (i+1),
-              value: this.fullAttack(this.baseAttacks[0])
+              value: this.baseAttacks[0]
             });
           }
         }
@@ -211,7 +211,7 @@ export default defineComponent({
         let iterative = this.baseAttacks[i];
         fullAttacks.push({
           name: 'attack ' + (i+1),
-          value: this.fullAttack(iterative)
+          value: iterative
         });
       }
 
@@ -226,23 +226,23 @@ export default defineComponent({
       for (var i = 0; i < this.fullAttacks.length; i++) {
         if (this.isFullAttack || this.selectedIterativeIndex == i) {
           let attack = this.fullAttacks[i];
-          macro += `{{ ${ attack.name }=${ attack.value } for ${ this.fullDamage }}}`;
+          macro += `{{ ${ attack.name }=${ this.fullAttackString(attack.value) } for ${ this.fullDamage }}}`;
         }
       }
       return macro;
     },
     simpleAttackRoll() {
-      var baseAttack = this.baseAttacks[this.isFullAttack ? 0 : this.selectedIterativeIndex];
+      var baseAttack = this.fullAttacks[this.isFullAttack ? 0 : this.selectedIterativeIndex];
       var attackRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
         ? `d20cs>${this.selectedAttack.crit}`
         : 'd20';
-      var attackBonus = baseAttack + this.attackStatBonus;
+      var attackBonus = baseAttack.value + this.attackStatBonus;
 
       let attackBuffs = this.getBuffs('attackMod');
       attackBuffs.forEach((buff: Buff) => {
         attackBonus += buff.value
       });
-      return `${attackRoll}+${attackBonus}`;
+      return `${baseAttack.name} ${attackRoll}+${attackBonus}`;
     },
     simpleDamageRoll() {
       var damageRoll = this.selectedAttack.damageDice;
@@ -280,7 +280,7 @@ export default defineComponent({
           return this.combinedBuffs[buffName].flat();
         }
       },
-      fullAttack(baseAttack: Number) {
+      fullAttackString(baseAttack: Number) {
         var dieRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
           ? `d20cs>${this.selectedAttack.crit}`
           : 'd20';
