@@ -24,6 +24,12 @@
         <br />
         <br />
 
+        <div v-if="!isFullAttack && iterativeNames.length > 1" v-for="(iterativeName, i) in iterativeNames">
+          <input type="radio" :id="'iterative' + i" :name="'iterative' + i" :value="i" v-model="selectedIterativeIndex" />
+          <label :for="'iterative' + i">{{iterativeName}}</label>
+        </div>
+        <br />
+
         {{ simpleAttack }}
         <br />
         <br />
@@ -60,6 +66,7 @@ export default defineComponent({
       selectedAttack: null,
       combinedBuffs: [],
       isFullAttack: true,
+      selectedIterativeIndex: 0,
       characters : [
         {
           name: 'Deebo',
@@ -98,6 +105,9 @@ export default defineComponent({
     this.selectFirstAttack();
   },
   computed: {
+    iterativeNames() {
+      return this.fullAttacks.map(a => a.name);
+    },
     extraAttacks() {
       return this.combinedBuffs['extraAttacks']
     },
@@ -180,10 +190,6 @@ export default defineComponent({
         value: this.fullAttack(this.baseAttacks[0])
       });
 
-      if (!this.isFullAttack) {
-        return fullAttacks;
-      }
-
       for (var extraAttackIndex in this.extraAttacks) {
         let extraAttack = this.extraAttacks[extraAttackIndex];
         if (extraAttack.value == 1) {
@@ -218,13 +224,15 @@ export default defineComponent({
     fullAttackMacro() {
       let macro = `&{template:default} {{name=${this.selectedAttack.name}}}`;
       for (var i = 0; i < this.fullAttacks.length; i++) {
-        let attack = this.fullAttacks[i];
-        macro += `{{ ${ attack.name }=${ attack.value } for ${ this.fullDamage }}}`;
+        if (this.isFullAttack || this.selectedIterativeIndex == i) {
+          let attack = this.fullAttacks[i];
+          macro += `{{ ${ attack.name }=${ attack.value } for ${ this.fullDamage }}}`;
+        }
       }
       return macro;
     },
     simpleAttackRoll() {
-      var baseAttack = this.baseAttacks[0];
+      var baseAttack = this.baseAttacks[this.isFullAttack ? 0 : this.selectedIterativeIndex];
       var attackRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
         ? `d20cs>${this.selectedAttack.crit}`
         : 'd20';
