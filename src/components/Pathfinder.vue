@@ -91,7 +91,7 @@ export default defineComponent({
             { name: 'elemental blood', bonuses: [ { damageDice: '+1d6', type: 'electricity' } ] }
           ] as Array<Buff>,
           conditionals: [
-            { name: 'charge', bonuses: [ { meleeAttack: 1 } ] },
+            { name: 'charge', bonuses: [ { meleeAttack: 2 } ] },
             { name: 'flanking', bonuses: [ { meleeAttack: 2 }]},
             { name: 'fighting defensively', bonuses: [ { meleeAttack: -4  } ] },
           ] as Array<Buff>,
