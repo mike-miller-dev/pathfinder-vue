@@ -73,7 +73,7 @@ export default defineComponent({
           baseAttack: 5,
           str: 19,
           attacks:  [
-            { name: 'Adamantine Nodachi +1', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 18, bonuses: [ { attackMod: 1, type: 'enh' }, { damageMod: 1, type: 'enh' } ]},
+            { name: 'Furious Adamantine Nodachi +1', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 18, bonuses: [ { attackMod: 2, type: 'enh' }, { damageMod: 2, type: 'enh' } ]},
             { name: 'Bardiche', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Heavy Flail', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Kukri', stat:'str', type: 'melee1h', damageDice: '1d4', crit: 18 },
@@ -239,25 +239,39 @@ export default defineComponent({
       var attackBonus = baseAttack.value + this.attackStatBonus;
 
       let attackBuffs = this.getBuffs('attackMod');
+      let attackBuffNonNumeric = '';
+
       attackBuffs.forEach((buff: Buff) => {
-        attackBonus += buff.value
+        let buffValue = Number(buff.value) || null;
+        if (buffValue) {
+          attackBonus += buffValue;
+        } else {
+          attackBuffNonNumeric += ` ${buff.value}`;
+        }
       });
-      return `${baseAttack.name} ${attackRoll}+${attackBonus}`;
+      return `${baseAttack.name} ${attackRoll}+${attackBonus}+${attackBuffNonNumeric}`;
     },
     simpleDamageRoll() {
       var damageRoll = this.selectedAttack.damageDice;
       var damageBonus = this.damageStatBonus;
 
       let damageBuffs = this.getBuffs('damageMod');
+      let damageBuffNonNumeric = '';
+
       damageBuffs.forEach((buff: Buff) => {
-        damageBonus += buff.value
+        let buffValue = Number(buff.value) || null;
+        if (buffValue) {
+          damageBonus += buffValue;
+        } else {
+          damageBuffNonNumeric += ` ${buff.value}`;
+        }
       });
 
       let extraDamageString = '';
       let damageDice = this.getBuffs('damageDice');
       damageDice.forEach((buff: Buff) => extraDamageString += buff.value);
 
-      return `${damageRoll}+${damageBonus}${extraDamageString}`;
+      return `${damageRoll}+${damageBonus}+${damageBuffNonNumeric}`;
     },
     simpleAttack() {
       return `${this.simpleAttackRoll} for ${this.simpleDamageRoll}`;
