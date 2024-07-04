@@ -246,32 +246,31 @@ export default defineComponent({
         if (buffValue) {
           attackBonus += buffValue;
         } else {
-          attackBuffNonNumeric += ` ${buff.value}`;
+          attackBuffNonNumeric += `+${buff.value}`;
         }
       });
-      return `${baseAttack.name} ${attackRoll}+${attackBonus}+${attackBuffNonNumeric}`;
+      return `${baseAttack.name} ${attackRoll}+${attackBonus}${attackBuffNonNumeric}`;
     },
     simpleDamageRoll() {
       var damageRoll = this.selectedAttack.damageDice;
       var damageBonus = this.damageStatBonus;
 
+      let extraDamageString = '';
+      let damageDice = this.getBuffs('damageDice');
+      damageDice.forEach((buff: Buff) => extraDamageString += `+${buff.value}`);
+
       let damageBuffs = this.getBuffs('damageMod');
-      let damageBuffNonNumeric = '';
 
       damageBuffs.forEach((buff: Buff) => {
         let buffValue = Number(buff.value) || null;
         if (buffValue) {
           damageBonus += buffValue;
         } else {
-          damageBuffNonNumeric += ` ${buff.value}`;
+          extraDamageString += `+${buff.value}`
         }
       });
 
-      let extraDamageString = '';
-      let damageDice = this.getBuffs('damageDice');
-      damageDice.forEach((buff: Buff) => extraDamageString += buff.value);
-
-      return `${damageRoll}+${damageBonus}+${damageBuffNonNumeric}`;
+      return `${damageRoll}+${damageBonus}${extraDamageString}`;
     },
     simpleAttack() {
       return `${this.simpleAttackRoll} for ${this.simpleDamageRoll}`;
