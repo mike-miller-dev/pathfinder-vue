@@ -245,8 +245,10 @@ export default defineComponent({
         let buffValue = Number(buff.value) || null;
         if (buffValue) {
           attackBonus += buffValue;
+        } else if (attackBuffNonNumeric.length > 0) {
+          attackBuffNonNumeric += `${buff.value}`
         } else {
-          attackBuffNonNumeric += `+${buff.value}`;
+          attackBuffNonNumeric += `+${buff.value}`
         }
       });
       return `${baseAttack.name} ${attackRoll}+${attackBonus}${attackBuffNonNumeric}`;
@@ -257,7 +259,13 @@ export default defineComponent({
 
       let extraDamageString = '';
       let damageDice = this.getBuffs('damageDice');
-      damageDice.forEach((buff: Buff) => extraDamageString += `+${buff.value}`);
+      damageDice.forEach((buff: Buff) => {
+        if (extraDamageString.length > 0) {
+          extraDamageString += `+${buff.value}`
+        } else {
+          extraDamageString += `${buff.value}`
+        }
+      });
 
       let damageBuffs = this.getBuffs('damageMod');
 
@@ -265,8 +273,10 @@ export default defineComponent({
         let buffValue = Number(buff.value) || null;
         if (buffValue) {
           damageBonus += buffValue;
-        } else {
+        } else if (extraDamageString.length > 0) {
           extraDamageString += `+${buff.value}`
+        } else {
+          extraDamageString += `${buff.value}`
         }
       });
 
