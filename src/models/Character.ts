@@ -6,5 +6,5 @@ export interface Character {
     attacks: Array<CharacterAttack>;
     partyBuffs: Array<Buff>;
     selfBuffs: Array<Buff>;
-    conditionals: Array<Buff>;
+    actions: Array<Buff>;
 };

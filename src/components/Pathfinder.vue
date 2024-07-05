@@ -73,7 +73,10 @@ export default defineComponent({
           baseAttack: 5,
           str: 19,
           attacks:  [
-            { name: 'Furious Adamantine Nodachi +1', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 18, bonuses: [ { attackMod: 1, type: 'enh' }, { damageMod: 1, type: 'enh' } ]},
+            { name: 'Furious Adamantine Nodachi +1', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 18,
+              bonuses: [ { attackMod: 1, type: 'enh' }, { damageMod: 1, type: 'enh' }],
+              conditionalBonuses: [{condition: 'raging', bonuses: [ { attackMod: 3, type: 'enh' }, { damageMod: 3, type: 'enh' }],}]
+            },
             { name: 'Bardiche', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Heavy Flail', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Kukri', stat:'str', type: 'melee1h', damageDice: '1d4', crit: 18 },
@@ -85,12 +88,12 @@ export default defineComponent({
             { name: 'haste', bonuses: [ { attackMod: 1, extraAttacks: 1 } ] },
           ] as Array<Buff>,
           selfBuffs : [
-            { name: 'rage', bonuses: [ { str: 4, type: 'morale' }, { attackMod: 3, type: 'enh' }, { damageMod: 3, type: 'enh' } ] },
+            { name: 'rage', conditions: ['raging'], bonuses: [ { str: 4, type: 'morale' } ] },
             { name: 'power attack', bonuses: [ { meleeAttack: -2, damage1h: +4, damage2h: +6  } ] },
             { name: 'robot slayer', bonuses: [ { attackMod: 1, type: 'trait' }]},
             { name: 'elemental blood', bonuses: [ { damageDice: '+1d6', type: 'electricity' } ] }
           ] as Array<Buff>,
-          conditionals: [
+          actions: [
             { name: 'charge', bonuses: [ { meleeAttack: 2 } ] },
             { name: 'flanking', bonuses: [ { meleeAttack: 2 }]},
             { name: 'fighting defensively', bonuses: [ { meleeAttack: -4  } ] },

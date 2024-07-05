@@ -5,7 +5,7 @@
         -------------------
         <BonusList :bonuses="character.selfBuffs" @changed="this.selectedSelfBuffs = $event" />
         -------------------
-        <BonusList :bonuses="character.conditionals" @changed="this.selectedConditionals = $event" />
+        <BonusList :bonuses="character.actions" @changed="this.selectedActions = $event" />
         -------------------
         <TemporaryBonuses @changed="this.temporaryBuffs = $event" />
         -------------------
@@ -13,6 +13,7 @@
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue'
+  import Bonus from '@/models/Bonus.vue';
   import BonusList from './BonusList.vue';
   import TemporaryBonuses from './TemporaryBonuses.vue';
   export default defineComponent({
@@ -36,7 +37,7 @@
       return {
         selectedSelfBuffs: [],
         selectedPartyBuffs: [],
-        selectedConditionals: [],
+        selectedActions: [],
         temporaryBuffs: []
       }
     },
@@ -46,8 +47,20 @@
           bonuses: this.selectedAttack.bonuses
         };
       },
+      selectedBuffs() {
+        return this.selectedSelfBuffs.concat(this.selectedActions, this.selectedPartyBuffs, this.temporaryBuffs, this.weaponBonuses);
+      },
+      conditions() {
+        return this.selectedBuffs.filter(b => b.conditions != null).flatMap(b => b.conditions);
+      },
+      appliedConditionals() {
+          if(!this.selectedAttack || !this.selectedAttack.conditionalBonuses) {
+            return [];
+          }
+          return this.selectedAttack.conditionalBonuses.filter(c => this.conditions.includes(c.condition));
+      },
       allBonuses() {
-        return this.selectedSelfBuffs.concat(this.selectedConditionals, this.selectedPartyBuffs, this.temporaryBuffs, this.weaponBonuses);
+        return this.selectedBuffs.concat(this.appliedConditionals);
       },
       isMeleeAttack() {
         return this.selectedAttack.type.includes('melee');
