@@ -83,8 +83,8 @@ export default defineComponent({
             { name: 'Claws', stat:'str', type: 'melee1h', damageDice: '1d6', attacks: 2 },
           ] as Array<CharacterAttack>,
           partyBuffs : [
-            {  name: 'flagbearer',  bonuses: [ { attackMod: 2, damageMod: 2, fearSave: 2, charmSave: 2, type: 'morale' } ] },
-            {  name: 'inspire courage',  bonuses: [ { attackMod: 1, damageMod: 1, type: 'competence' } ] },
+            {  name: 'flagbearer',  bonuses: [ { attackMod: 1, damageMod: 1, fearSave: 1, charmSave: 1, type: 'morale' } ] },
+            {  name: 'inspire courage',  bonuses: [ { attackMod: 2, damageMod: 2, fearSave: 2, type: 'competence' } ] },
             { name: 'haste', bonuses: [ { attackMod: 1, extraAttacks: 1 } ] },
           ] as Array<Buff>,
           selfBuffs : [
