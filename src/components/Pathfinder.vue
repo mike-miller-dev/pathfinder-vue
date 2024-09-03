@@ -73,14 +73,14 @@ export default defineComponent({
           baseAttack: 6,
           str: 19,
           attacks:  [
-            { name: 'Furious Adamantine Nodachi +1', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 18,
+            { name: 'Furious Adamantine Nodachi +1', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 18,
               bonuses: [ { attackMod: 1, type: 'enh' }, { damageMod: 1, type: 'enh' }],
               conditionalBonuses: [{condition: 'raging', bonuses: [ { attackMod: 3, type: 'enh' }, { damageMod: 3, type: 'enh' }],}]
             },
-            { name: 'Bardiche', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
-            { name: 'Heavy Flail', stat:'str', type: 'melee2h', damageDice: 'd10', crit: 19},
-            { name: 'Kukri', stat:'str', type: 'melee1h', damageDice: '1d4', crit: 18 },
-            { name: 'Claws', stat:'str', type: 'melee1h', damageDice: '1d6', attacks: 2 },
+            { name: 'Bardiche', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 19},
+            { name: 'Heavy Flail', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 19},
+            { name: 'Kukri', stat: 'str', type: 'melee1h', damageDice: '1d4', crit: 18 },
+            { name: 'Claws', stat: 'str', type: 'melee1h', damageDice: '1d6', attacks: 2 },
           ] as Array<CharacterAttack>,
           partyBuffs : [
             {  name: 'flagbearer',  bonuses: [ { attackMod: 1, damageMod: 1, fearSave: 1, charmSave: 1, type: 'morale' } ] },

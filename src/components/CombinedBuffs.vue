@@ -63,7 +63,10 @@
         return this.selectedBuffs.concat(this.appliedConditionals);
       },
       isMeleeAttack() {
-        return this.selectedAttack.type.includes('melee');
+        return this.selectedAttack.type.toLowerCase().includes('melee');
+      },
+      isRangedAttack() {
+        return this.selectedAttack.type.toLowerCase().includes('range');
       },
       combinedBonuses() {
         let combined = {};
@@ -82,27 +85,34 @@
               }
 
               let combinedType = bonusField;
-              if (combinedType == 'damage1h' || combinedType == 'damage2h' || combinedType == 'meleeDamage') {
-                if ((combinedType == 'damage1h' && this.selectedAttack.type == 'melee1h')
-                  || (combinedType == 'damage2h' && this.selectedAttack.type == 'melee2h')
-                  || (combinedType == 'meleeDamage')) {
+              if (this.isDamageMod(combinedType)) {
+                if (this.isApplicableDamageMod(combinedType)) {
                   combinedType = 'damageMod';
                 } else {
+                  // it is a damage mod, but not one applicable to their selected weapon
+                  console.log({
+                    combinedType: combinedType,
+                    selectedType: this.selectedAttack.type
+                  });
                   continue;
                 }
               }
 
-              if (combinedType == 'meleeAttack') {
-                if (this.isMeleeAttack) {
+              if (this.isAttackMod(combinedType)) {
+                if (this.isApplicableAttackMod(combinedType)) {
                   combinedType = 'attackMod';
                 } else {
+                  console.log({
+                    combinedType: combinedType,
+                    selectedType: this.selectedAttack.type
+                  });
                   continue;
                 }
               }
 
 
-              let propertyValue = bonus[bonusField];
-              //example propertyValue: 4
+              let bonusValue = bonus[bonusField];
+              //example bonusValue: 4
               
               if (combined.hasOwnProperty(combinedType)) {
                 let existingBuffs = combined[combinedType];
@@ -111,16 +121,16 @@
                   //add a new type to the existing buffs
                   combined[combinedType].push({
                     'name': buff.name,
-                    'value': propertyValue,
+                    'value': bonusValue,
                     'type': bonus.type
                   });
                 } else {
                   let existingSameTypeBuff = existingBuffs[existingIndex];
-                  if (this.isLarger(existingSameTypeBuff.value, propertyValue)) {
+                  if (bonusValue > existingSameTypeBuff.value, bonusValue) {
                     //replace with the newer larger buff
                     combined[combinedType][existingIndex] = {
                       'name': buff.name,
-                      'value': propertyValue,
+                      'value': bonusValue,
                       'type': bonus.type
                     };
                 }
@@ -129,7 +139,7 @@
                 //push a new type with the new buff
                 combined[combinedType] = [{
                   'name': buff.name,
-                  'value': propertyValue,
+                  'value': bonusValue,
                   'type': bonus.type
                 }];
               }
@@ -153,6 +163,24 @@
     methods: {
       isLarger(oldVal: Number, newVal: Number) {
         return newVal > oldVal
+      },
+      isAttackMod(combinedType) {
+        return combinedType.toLowerCase().includes('attack');
+      },
+      isDamageMod(combinedType) {
+        return combinedType.toLowerCase().includes('damage');
+      },
+      isApplicableAttackMod(combinedType) {
+        return (combinedType == 'attackMod')
+          || (this.isMeleeAttack && combinedType == 'meleeAttack')
+          || (this.isRangedAttack && combinedType == 'rangedAttack');
+      },
+      isApplicableDamageMod(combinedType) {
+        return (combinedType == 'damageMod')
+          || (combinedType == 'damage1h' && this.selectedAttack.type == 'melee1h')
+          || (combinedType == 'damage2h' && this.selectedAttack.type == 'melee2h')
+          || (this.isMeleeAttack && combinedType == 'meleeDamage')
+          || (this.isRangedAttack && combinedType == 'rangedDamage');
       },
     },
   });
