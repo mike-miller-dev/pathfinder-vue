@@ -90,10 +90,6 @@
                   combinedType = 'damageMod';
                 } else {
                   // it is a damage mod, but not one applicable to their selected weapon
-                  console.log({
-                    combinedType: combinedType,
-                    selectedType: this.selectedAttack.type
-                  });
                   continue;
                 }
               }
@@ -102,10 +98,6 @@
                 if (this.isApplicableAttackMod(combinedType)) {
                   combinedType = 'attackMod';
                 } else {
-                  console.log({
-                    combinedType: combinedType,
-                    selectedType: this.selectedAttack.type
-                  });
                   continue;
                 }
               }
@@ -165,10 +157,10 @@
         return newVal > oldVal
       },
       isAttackMod(combinedType) {
-        return combinedType.toLowerCase().includes('attack');
+        return ['meleeAttack', 'rangedAttack', 'attackMod'].includes(combinedType);
       },
       isDamageMod(combinedType) {
-        return combinedType.toLowerCase().includes('damage');
+        return ['damage1h', 'damage2h', 'damageMod', 'meleeDamage', 'rangedDamage'].includes(combinedType);
       },
       isApplicableAttackMod(combinedType) {
         return (combinedType == 'attackMod')
