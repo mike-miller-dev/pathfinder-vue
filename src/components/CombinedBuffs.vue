@@ -105,35 +105,27 @@
 
               let bonusValue = bonus[bonusField];
               //example bonusValue: 4
-              
+
+              let newBuff = {
+                'name': buff.name,
+                'value': bonusValue,
+                'type': bonus.type
+              };
+
               if (combined.hasOwnProperty(combinedType)) {
                 let existingBuffs = combined[combinedType];
                 let existingIndex = existingBuffs.findIndex((existingBuff: Bonus) => bonus.type && existingBuff.type === bonus.type);
+
                 if (existingIndex < 0) {
                   //add a new type to the existing buffs
-                  combined[combinedType].push({
-                    'name': buff.name,
-                    'value': bonusValue,
-                    'type': bonus.type
-                  });
-                } else {
-                  let existingSameTypeBuff = existingBuffs[existingIndex];
-                  if (bonusValue > existingSameTypeBuff.value, bonusValue) {
-                    //replace with the newer larger buff
-                    combined[combinedType][existingIndex] = {
-                      'name': buff.name,
-                      'value': bonusValue,
-                      'type': bonus.type
-                    };
-                }
+                  combined[combinedType].push(newBuff);
+                } else if (bonusValue > existingBuffs[existingIndex].value) {
+                  //replace with the newer larger buff
+                  combined[combinedType][existingIndex] = newBuff;
                 }
               } else {
                 //push a new type with the new buff
-                combined[combinedType] = [{
-                  'name': buff.name,
-                  'value': bonusValue,
-                  'type': bonus.type
-                }];
+                combined[combinedType] = [newBuff];
               }
             }
           }
