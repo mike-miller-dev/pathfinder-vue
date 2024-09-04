@@ -57,7 +57,7 @@
           if(!this.selectedAttack || !this.selectedAttack.conditionalBonuses) {
             return [];
           }
-          return this.selectedAttack.conditionalBonuses.filter(c => this.conditions.includes(c.condition));
+          return this.selectedAttack.conditionalBonuses.filter((c: Bonus) => this.conditions.includes(c.condition));
       },
       allBonuses() {
         return this.selectedBuffs.concat(this.appliedConditionals);
@@ -108,7 +108,7 @@
               
               if (combined.hasOwnProperty(combinedType)) {
                 let existingBuffs = combined[combinedType];
-                let existingIndex = existingBuffs.findIndex(existingBuff => bonus.type && existingBuff.type === bonus.type);
+                let existingIndex = existingBuffs.findIndex((existingBuff: Bonus) => bonus.type && existingBuff.type === bonus.type);
                 if (existingIndex < 0) {
                   //add a new type to the existing buffs
                   combined[combinedType].push({
@@ -156,18 +156,18 @@
       isLarger(oldVal: Number, newVal: Number) {
         return newVal > oldVal
       },
-      isAttackMod(combinedType) {
+      isAttackMod(combinedType: string) {
         return ['meleeAttack', 'rangedAttack', 'attackMod'].includes(combinedType);
       },
-      isDamageMod(combinedType) {
+      isDamageMod(combinedType: string) {
         return ['damage1h', 'damage2h', 'damageMod', 'meleeDamage', 'rangedDamage'].includes(combinedType);
       },
-      isApplicableAttackMod(combinedType) {
+      isApplicableAttackMod(combinedType: string) {
         return (combinedType == 'attackMod')
           || (this.isMeleeAttack && combinedType == 'meleeAttack')
           || (this.isRangedAttack && combinedType == 'rangedAttack');
       },
-      isApplicableDamageMod(combinedType) {
+      isApplicableDamageMod(combinedType: string) {
         return (combinedType == 'damageMod')
           || (combinedType == 'damage1h' && this.selectedAttack.type == 'melee1h')
           || (combinedType == 'damage2h' && this.selectedAttack.type == 'melee2h')
