@@ -70,7 +70,7 @@ export default defineComponent({
       characters : [
         {
           name: 'Deebo',
-          baseAttack: 6,
+          baseAttack: 7,
           str: 19,
           attacks:  [
             { name: 'Furious Adamantine Nodachi +1', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 18,
