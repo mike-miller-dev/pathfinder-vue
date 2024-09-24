@@ -29,8 +29,8 @@
             {{ simpleAttack(iterative) }}
           </div>
           <div v-else>
-            <input type="radio" :id="iterative.name" :name="iterative.name" :value="i" v-model="selectedIterativeIndex" />
-            <label :for="iterative.name">{{ simpleAttack(iterative) }}</label>
+            <input type="radio" :id="'iterative' + i" :name="'iterative' + i" :value="i" v-model="selectedIterativeIndex" />
+            <label :for="'iterative' + i">{{ simpleAttack(iterative) }}</label>
           </div>
         </div>
 
