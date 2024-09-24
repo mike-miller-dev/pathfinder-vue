@@ -20,17 +20,20 @@
         <br />
         <br />
 
-        <Slider :value="isFullAttack" @changed="isFullAttack = $event" />
+        <Slider v-if="fullAttacks.length > 1" :value="isFullAttack" @changed="isFullAttack = $event" />
         <br />
         <br />
 
-        <div v-if="!isFullAttack && iterativeNames.length > 1" v-for="(iterativeName, i) in iterativeNames">
-          <input type="radio" :id="'iterative' + i" :name="'iterative' + i" :value="i" v-model="selectedIterativeIndex" />
-          <label :for="'iterative' + i">{{iterativeName}}</label>
+        <div v-for="(iterative, i) in fullAttacks">
+          <div v-if="isFullAttack">
+            {{ simpleAttack(iterative) }}
+          </div>
+          <div v-else>
+            <input type="radio" :id="iterative.name" :name="iterative.name" :value="i" v-model="selectedIterativeIndex" />
+            <label :for="iterative.name">{{ simpleAttack(iterative) }}</label>
+          </div>
         </div>
-        <br />
 
-        {{ simpleAttack }}
         <br />
         <br />
 
@@ -108,9 +111,6 @@ export default defineComponent({
     this.selectFirstAttack();
   },
   computed: {
-    iterativeNames() {
-      return this.fullAttacks.map(a => a.name);
-    },
     extraAttacks() {
       return this.combinedBuffs['extraAttacks']
     },
@@ -226,35 +226,16 @@ export default defineComponent({
     },
     fullAttackMacro() {
       let macro = `&{template:default} {{name=${this.selectedAttack.name}}}`;
-      for (var i = 0; i < this.fullAttacks.length; i++) {
-        if (this.isFullAttack || this.selectedIterativeIndex == i) {
+      if (this.isFullAttack) {
+        for (var i = 0; i < this.fullAttacks.length; i++) {
           let attack = this.fullAttacks[i];
           macro += `{{ ${ attack.name }=${ this.fullAttackString(attack.value) } for ${ this.fullDamage }}}`;
         }
+      } else {
+        let attack = this.fullAttacks[this.selectedIterativeIndex];
+        macro += `{{ ${ attack.name }=${ this.fullAttackString(attack.value) } for ${ this.fullDamage }}}`;
       }
       return macro;
-    },
-    simpleAttackRoll() {
-      var baseAttack = this.fullAttacks[this.isFullAttack ? 0 : this.selectedIterativeIndex];
-      var attackRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
-        ? `d20cs>${this.selectedAttack.crit}`
-        : 'd20';
-      var attackBonus = baseAttack.value + this.attackStatBonus;
-
-      let attackBuffs = this.getBuffs('attackMod');
-      let attackBuffNonNumeric = '';
-
-      attackBuffs.forEach((buff: Buff) => {
-        let buffValue = Number(buff.value) || null;
-        if (buffValue) {
-          attackBonus += buffValue;
-        } else if (attackBuffNonNumeric.length > 0) {
-          attackBuffNonNumeric += `${buff.value}`
-        } else {
-          attackBuffNonNumeric += `+${buff.value}`
-        }
-      });
-      return `${baseAttack.name} ${attackRoll}+${attackBonus}${attackBuffNonNumeric}`;
     },
     simpleDamageRoll() {
       var damageRoll = this.selectedAttack.damageDice;
@@ -285,9 +266,6 @@ export default defineComponent({
 
       return `${damageRoll}+${damageBonus}${extraDamageString}`;
     },
-    simpleAttack() {
-      return `${this.simpleAttackRoll} for ${this.simpleDamageRoll}`;
-    },
   },
   setup() {
       const toast = useToast();
@@ -296,64 +274,91 @@ export default defineComponent({
       return { toast }
   },
   methods: {
-      compareBuffValues(a: Buff, b: Buff) {
-          return b.value - a.value;
-      },
-      getBuffs(buffName: string) {
-        if (!this.combinedBuffs || !this.combinedBuffs[buffName]) {
-          return [];
-        } else {
-          return this.combinedBuffs[buffName].flat();
-        }
-      },
-      fullAttackString(baseAttack: Number) {
-        var dieRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
-          ? `d20cs>${this.selectedAttack.crit}`
-          : 'd20';
-        var attack = `${dieRoll}+${baseAttack}[base]+${this.attackStatBonus}[${this.selectedAttack.stat}]${this.attackBuffs}`
-        return `[[ ${attack} ]]`;
-      },
-      parseBuff(buff: Buff) {
-        if (!buff) {
-          return '';
-        }
-        let sign = buff.value >= 0 ? '+' : '';
-        return ` ${sign}${buff.value}[${buff.name ? buff.name : ''}${buff.type ? ((buff.name?' ':'')+ buff.type) : ''}]`;
-      },
-      selectFirstAttack() {
-        this.selectedAttack = (this.selectedCharacter && this.selectedCharacter.attacks)
-          ? this.selectedCharacter.attacks[0]
-          : null;
-      },
-      copyToClipboard() {
-        const clipboardData =
-          event.clipboardData ||
-          window.clipboardData ||
-          event.originalEvent?.clipboardData ||
-          navigator.clipboard;
-
-        clipboardData.writeText(this.fullAttackMacro);
-
-        this.toast.info("Copied to Clipboard", {
-          position: "top-right",
-          timeout: 1000,
-          closeOnClick: true,
-          pauseOnFocusLoss: false,
-          pauseOnHover: false,
-          draggable: false,
-          showCloseButtonOnHover: false,
-          hideProgressBar: true,
-          closeButton: "button",
-          icon: true,
-          rtl: false
-        });
-      },
+    simpleAttack(iterative) {
+      return `${this.simpleAttackRoll(iterative)} for ${this.simpleDamageRoll}`;
     },
+    simpleAttackRoll(iterative) {
+      var attackRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
+        ? `d20cs>${this.selectedAttack.crit}`
+        : 'd20';
+      var attackBonus = iterative.value + this.attackStatBonus;
+
+      let attackBuffs = this.getBuffs('attackMod');
+      let attackBuffNonNumeric = '';
+
+      attackBuffs.forEach((buff: Buff) => {
+        let buffValue = Number(buff.value) || null;
+        if (buffValue) {
+          attackBonus += buffValue;
+        } else if (attackBuffNonNumeric.length > 0) {
+          attackBuffNonNumeric += `${buff.value}`
+        } else {
+          attackBuffNonNumeric += `+${buff.value}`
+        }
+      });
+      return `${iterative.name} ${attackRoll}+${attackBonus}${attackBuffNonNumeric}`;
+    },
+    compareBuffValues(a: Buff, b: Buff) {
+        return b.value - a.value;
+    },
+    getBuffs(buffName: string) {
+      if (!this.combinedBuffs || !this.combinedBuffs[buffName]) {
+        return [];
+      } else {
+        return this.combinedBuffs[buffName].flat();
+      }
+    },
+    fullAttackString(baseAttack: Number) {
+      var dieRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
+        ? `d20cs>${this.selectedAttack.crit}`
+        : 'd20';
+      var attack = `${dieRoll}+${baseAttack}[base]+${this.attackStatBonus}[${this.selectedAttack.stat}]${this.attackBuffs}`
+      return `[[ ${attack} ]]`;
+    },
+    parseBuff(buff: Buff) {
+      if (!buff) {
+        return '';
+      }
+      let sign = buff.value >= 0 ? '+' : '';
+      return ` ${sign}${buff.value}[${buff.name ? buff.name : ''}${buff.type ? ((buff.name?' ':'')+ buff.type) : ''}]`;
+    },
+    selectFirstAttack() {
+      this.selectedAttack = (this.selectedCharacter && this.selectedCharacter.attacks)
+        ? this.selectedCharacter.attacks[0]
+        : null;
+    },
+    copyToClipboard() {
+      const clipboardData =
+        event.clipboardData ||
+        window.clipboardData ||
+        event.originalEvent?.clipboardData ||
+        navigator.clipboard;
+
+      clipboardData.writeText(this.fullAttackMacro);
+
+      this.toast.info("Copied to Clipboard", {
+        position: "top-right",
+        timeout: 1000,
+        closeOnClick: true,
+        pauseOnFocusLoss: false,
+        pauseOnHover: false,
+        draggable: false,
+        showCloseButtonOnHover: false,
+        hideProgressBar: true,
+        closeButton: "button",
+        icon: true,
+        rtl: false
+      });
+    },
+  },
 });
 </script>
 
 <style scoped>
   .macro:hover {
     cursor: pointer;
-}
+  }
+  input {
+    margin-right: 3px;
+  }
 </style>
