@@ -33,8 +33,6 @@
             <label :for="'iterative' + i">{{ simpleAttack(iterative) }}</label>
           </div>
         </div>
-
-        <br />
         <br />
 
         <div class="macro" v-if="fullAttackMacro" @click="copyToClipboard">
@@ -77,11 +75,12 @@ export default defineComponent({
           str: 19,
           attacks:  [
             { name: 'Furious Adamantine Nodachi +1', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 18,
-              bonuses: [ { attackMod: 1, type: 'enh' }, { damageMod: 1, type: 'enh' }],
-              conditionalBonuses: [{condition: 'raging', bonuses: [ { attackMod: 3, type: 'enh' }, { damageMod: 3, type: 'enh' }],}]
+              bonuses: [
+                { attackMod: 1, damageMod: 1, type: 'enh' },
+              ],
+              conditionalBonuses: [ {condition: 'raging', bonuses: [ { attackMod: 3, damageMod: 3,type: 'enh' }] }]
             },
             { name: 'Bardiche', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 19},
-            { name: 'Heavy Flail', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Kukri', stat: 'str', type: 'melee1h', damageDice: '1d4', crit: 18 },
             { name: 'Claws', stat: 'str', type: 'melee1h', damageDice: '1d6', attacks: 2 },
           ] as Array<CharacterAttack>,
@@ -264,7 +263,7 @@ export default defineComponent({
         }
       });
 
-      return `${damageRoll}+${damageBonus}${extraDamageString}`;
+      return `[[${damageRoll}+${damageBonus}${extraDamageString}]]`;
     },
   },
   setup() {
@@ -274,10 +273,10 @@ export default defineComponent({
       return { toast }
   },
   methods: {
-    simpleAttack(iterative) {
+    simpleAttack(iterative: IterativeAttack) {
       return `${this.simpleAttackRoll(iterative)} for ${this.simpleDamageRoll}`;
     },
-    simpleAttackRoll(iterative) {
+    simpleAttackRoll(iterative: IterativeAttack) {
       var attackRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
         ? `d20cs>${this.selectedAttack.crit}`
         : 'd20';
@@ -296,7 +295,7 @@ export default defineComponent({
           attackBuffNonNumeric += `+${buff.value}`
         }
       });
-      return `${iterative.name} ${attackRoll}+${attackBonus}${attackBuffNonNumeric}`;
+      return `${iterative.name} [[${attackRoll}+${attackBonus}${attackBuffNonNumeric}]]`;
     },
     compareBuffValues(a: Buff, b: Buff) {
         return b.value - a.value;
