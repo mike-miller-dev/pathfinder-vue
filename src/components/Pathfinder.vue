@@ -72,11 +72,12 @@ export default defineComponent({
         {
           name: 'Deebo',
           baseAttack: 7,
-          str: 19,
+          str: 21,
           attacks:  [
             { name: 'Furious Adamantine Nodachi +1', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 18,
               bonuses: [
                 { attackMod: 1, damageMod: 1, type: 'enh' },
+                { attackMod: 3, damageMod: 3, type: 'training' }
               ],
               conditionalBonuses: [ {condition: 'raging', bonuses: [ { attackMod: 3, damageMod: 3,type: 'enh' }] }]
             },
@@ -188,7 +189,7 @@ export default defineComponent({
 
       //first attack
       fullAttacks.push({
-        name: 'attack' + (this.baseAttacks.length > 1 ? ' 1' : ''),
+        name: `attack ${this.baseAttacks.length > 1 ? ' 1' : ''}`,
         value: this.baseAttacks[0]
       });
 
@@ -212,7 +213,7 @@ export default defineComponent({
       for (var i = 1; i < this.baseAttacks.length; i++) {
         let iterative = this.baseAttacks[i];
         fullAttacks.push({
-          name: 'attack ' + (i+1),
+          name: `attack ${i+1}`,
           value: iterative
         });
       }
