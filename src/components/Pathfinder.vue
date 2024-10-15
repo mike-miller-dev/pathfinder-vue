@@ -72,12 +72,13 @@ export default defineComponent({
         {
           name: 'Deebo',
           baseAttack: 7,
-          str: 21,
+          str: 19,
           attacks:  [
-            { name: 'Furious Adamantine Nodachi +1', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 18,
+            { name: 'Furious Adamantine Chainsaw +1', stat: 'str', type: 'melee2h', damageDice: '3d6', crit: 18,
               bonuses: [
                 { attackMod: 1, damageMod: 1, type: 'enh' },
-                { attackMod: 3, damageMod: 3, type: 'training' }
+                { attackMod: 3, damageMod: 3, type: 'training' },
+                { attackMod: -1, type: 'buckler' }
               ],
               conditionalBonuses: [ {condition: 'raging', bonuses: [ { attackMod: 3, damageMod: 3,type: 'enh' }] }]
             },
