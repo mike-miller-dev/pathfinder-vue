@@ -245,10 +245,10 @@ export default defineComponent({
       let extraDamageString = '';
       let damageDice = this.getBuffs('damageDice');
       damageDice.forEach((buff: Buff) => {
-        if (extraDamageString.length > 0) {
-          extraDamageString += `+${buff.value}`
-        } else {
+         if (buff.value.startsWith('-')) {
           extraDamageString += `${buff.value}`
+        } else {
+          extraDamageString += `+${buff.value}`
         }
       });
 
@@ -258,10 +258,10 @@ export default defineComponent({
         let buffValue = Number(buff.value) || null;
         if (buffValue) {
           damageBonus += buffValue;
-        } else if (extraDamageString.length > 0) {
-          extraDamageString += `+${buff.value}`
-        } else {
+        } else if (buff.value.startsWith('-')) {
           extraDamageString += `${buff.value}`
+        } else {
+          extraDamageString += `+${buff.value}`
         }
       });
 
@@ -320,7 +320,17 @@ export default defineComponent({
       if (!buff) {
         return '';
       }
-      let sign = buff.value >= 0 ? '+' : '';
+
+      let buffValue = Number(buff.value) || null;
+      let sign: string;
+      if (buffValue) {
+        sign = buff.value >= 0 ? '+' : '';
+      } else if (buff.value.startsWith('-')) {
+        sign = ''
+      } else {
+        sign = '+';
+      }
+
       return ` ${sign}${buff.value}[${buff.name ? buff.name : ''}${buff.type ? ((buff.name?' ':'')+ buff.type) : ''}]`;
     },
     selectFirstAttack() {
