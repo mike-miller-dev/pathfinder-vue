@@ -95,7 +95,7 @@ export default defineComponent({
             { name: 'rage', conditions: ['raging'], bonuses: [ { str: 4, type: 'morale' } ] },
             { name: 'power attack', bonuses: [ { meleeAttack: -2, damage1h: +4, damage2h: +6  } ] },
             { name: 'robot slayer', bonuses: [ { attackMod: 1, type: 'trait' }]},
-            { name: 'elemental blood', bonuses: [ { damageDice: '+1d6', type: 'electricity' } ] }
+            { name: 'elemental blood', bonuses: [ { damageDice: '1d6', type: 'electricity' } ] }
           ] as Array<Buff>,
           actions: [
             { name: 'charge', bonuses: [ { meleeAttack: 2 } ] },
@@ -245,7 +245,7 @@ export default defineComponent({
       let extraDamageString = '';
       let damageDice = this.getBuffs('damageDice');
       damageDice.forEach((buff: Buff) => {
-         if (buff.value.startsWith('-')) {
+         if (buff.value.startsWith('+') || buff.value.startsWith('-')) {
           extraDamageString += `${buff.value}`
         } else {
           extraDamageString += `+${buff.value}`
@@ -258,7 +258,7 @@ export default defineComponent({
         let buffValue = Number(buff.value) || null;
         if (buffValue) {
           damageBonus += buffValue;
-        } else if (buff.value.startsWith('-')) {
+        } else if (buff.value.startsWith('+') || buff.value.startsWith('-')) {
           extraDamageString += `${buff.value}`
         } else {
           extraDamageString += `+${buff.value}`
@@ -291,7 +291,7 @@ export default defineComponent({
         let buffValue = Number(buff.value) || null;
         if (buffValue) {
           attackBonus += buffValue;
-        } else if (attackBuffNonNumeric.length > 0) {
+        } else if (buff.value.startsWith('+') || buff.value.startsWith('-')) {
           attackBuffNonNumeric += `${buff.value}`
         } else {
           attackBuffNonNumeric += `+${buff.value}`
@@ -325,13 +325,13 @@ export default defineComponent({
       let sign: string;
       if (buffValue) {
         sign = buff.value >= 0 ? '+' : '';
-      } else if (buff.value.startsWith('-')) {
+      } else if (buff.value.startsWith('+') || buff.value.startsWith('-')) {
         sign = ''
       } else {
         sign = '+';
       }
 
-      return ` ${sign}${buff.value}[${buff.name ? buff.name : ''}${buff.type ? ((buff.name?' ':'')+ buff.type) : ''}]`;
+      return ` ${sign}${buff.value}[${buff.name ? buff.name : ''}${buff.name && buff.type ? ' ' : ''}${buff.type ? buff.type : ''}]`;
     },
     selectFirstAttack() {
       this.selectedAttack = (this.selectedCharacter && this.selectedCharacter.attacks)
