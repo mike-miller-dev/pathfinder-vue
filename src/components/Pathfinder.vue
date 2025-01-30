@@ -71,16 +71,16 @@ export default defineComponent({
       characters : [
         {
           name: 'Deebo',
-          baseAttack: 7,
-          str: 19,
+          baseAttack: 8,
+          str: 20,
           attacks:  [
-            { name: 'Furious Adamantine Chainsaw +1', stat: 'str', type: 'melee2h', damageDice: '3d6', crit: 18,
+            { name: 'Furious Adamantine Chainsaw +1', stat: 'str', type: 'melee2h', damageDice: '3d6', crit: 15,
               bonuses: [
                 { attackMod: 1, damageMod: 1, type: 'enh' },
                 { attackMod: 3, damageMod: 3, type: 'training' },
                 { attackMod: -1, type: 'buckler' }
               ],
-              conditionalBonuses: [ {condition: 'raging', bonuses: [ { attackMod: 3, damageMod: 3,type: 'enh' }] }]
+              conditionalBonuses: [ {condition: 'raging', bonuses: [ { attackMod: 3, damageMod: 3, type: 'enh' }] }]
             },
             { name: 'Bardiche', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Kukri', stat: 'str', type: 'melee1h', damageDice: '1d4', crit: 18 },
@@ -93,7 +93,7 @@ export default defineComponent({
           ] as Array<Buff>,
           selfBuffs : [
             { name: 'rage', conditions: ['raging'], bonuses: [ { str: 4, type: 'morale' } ] },
-            { name: 'power attack', bonuses: [ { meleeAttack: -2, damage1h: +4, damage2h: +6  } ] },
+            { name: 'power attack', bonuses: [ { meleeAttack: -3, damage1h: +6, damage2h: +9  } ] },
             { name: 'robot slayer', bonuses: [ { attackMod: 1, type: 'trait' }]},
             { name: 'elemental blood', bonuses: [ { damageDice: '1d6', type: 'electricity' } ] }
           ] as Array<Buff>,
@@ -148,7 +148,7 @@ export default defineComponent({
       let attackString = '';
 
       let buffs = this.getBuffs('attackMod');
-      buffs.sort(this.compareBuffValues).forEach((buff: Buff) => attackString += this.parseBuff(buff));
+      buffs.sort(this.compareBuffValues).forEach((buff: Buff) => attackString += ' ' + this.parseBuff(buff));
 
       return attackString;
     },
@@ -156,12 +156,25 @@ export default defineComponent({
       let damageString = '';
 
       let buffs = this.getBuffs('damageMod');
-      buffs.sort(this.compareBuffValues).forEach((buff: Buff) => damageString += this.parseBuff(buff));
-
-      let damageDice = this.getBuffs('damageDice');
-      damageDice.forEach((buff: Buff) => damageString += this.parseBuff(buff));
+      buffs.sort(this.compareBuffValues).forEach((buff: Buff) => damageString += ' ' + this.parseBuff(buff));
 
       return damageString;
+    },
+    bonusDamageDice() {
+      let extraDamageString = '';
+
+      let damageDice = this.getBuffs('damageDice');
+      damageDice.forEach((buff: Buff) => {
+        let damageString = this.parseBuff(buff);
+
+        if (damageString.startsWith('-')) {
+          extraDamageString += `-[[${damageString.substring(1)}]]`
+        } else {
+          extraDamageString += `+[[${damageString}]]`
+        }
+      });
+
+      return extraDamageString;
     },
     baseAttacks() {
       var attackRange: Array<number> = [];
@@ -223,7 +236,7 @@ export default defineComponent({
     },
     fullDamage() {
       var attack = `${this.selectedAttack.damageDice}+${this.damageStatBonus}[${this.selectedAttack.stat}]${this.damageBuffs}`
-      return `[[ ${attack} ]] dmg`;
+      return `[[ ${attack} ]]${this.bonusDamageDice} dmg`;
     },
     fullAttackMacro() {
       let macro = `&{template:default} {{name=${this.selectedAttack.name}}}`;
@@ -265,7 +278,7 @@ export default defineComponent({
         }
       });
 
-      return `[[${damageRoll}+${damageBonus}${extraDamageString}]]`;
+      return `[[${damageRoll}+${damageBonus}${extraDamageString}]]${this.bonusDamageDice}`;
     },
   },
   setup() {
@@ -322,16 +335,11 @@ export default defineComponent({
       }
 
       let buffValue = Number(buff.value) || null;
-      let sign: string;
-      if (buffValue) {
-        sign = buff.value >= 0 ? '+' : '';
-      } else if (buff.value.startsWith('+') || buff.value.startsWith('-')) {
-        sign = ''
-      } else {
-        sign = '+';
-      }
+      let sign = (buffValue && buff.value >= 0)
+        ? '+'
+        : '';
 
-      return ` ${sign}${buff.value}[${buff.name ? buff.name : ''}${buff.name && buff.type ? ' ' : ''}${buff.type ? buff.type : ''}]`;
+      return `${sign}${buff.value}[${buff.name ? buff.name : ''}${buff.name && buff.type ? ' ' : ''}${buff.type ? buff.type : ''}]`;
     },
     selectFirstAttack() {
       this.selectedAttack = (this.selectedCharacter && this.selectedCharacter.attacks)
