@@ -256,15 +256,6 @@ export default defineComponent({
       var damageBonus = this.damageStatBonus;
 
       let extraDamageString = '';
-      let damageDice = this.getBuffs('damageDice');
-      damageDice.forEach((buff: Buff) => {
-         if (buff.value.startsWith('+') || buff.value.startsWith('-')) {
-          extraDamageString += `${buff.value}`
-        } else {
-          extraDamageString += `+${buff.value}`
-        }
-      });
-
       let damageBuffs = this.getBuffs('damageMod');
 
       damageBuffs.forEach((buff: Buff) => {
