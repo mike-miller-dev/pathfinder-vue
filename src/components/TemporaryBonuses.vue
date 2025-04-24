@@ -35,7 +35,9 @@
           'damage1h',
           'damage2h',
           'extraAttacks',
-          'damageDice'
+          'damageDice',
+          'str',
+          'dex'
         ]
       }
     },

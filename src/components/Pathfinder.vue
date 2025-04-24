@@ -121,11 +121,16 @@ export default defineComponent({
       }
       let stat = this.selectedAttack.stat;
       let characterStatValue = this.selectedCharacter[stat];
+
+      let statBuffTotal = 0;
       if (this.combinedBuffs && this.combinedBuffs.hasOwnProperty(stat)) {
-        let statBuffTotal = this.combinedBuffs[stat].reduce(
-          (accumulator, currentValue) => accumulator + currentValue.value,
-          0,
-        );
+        this.combinedBuffs[stat].forEach((buff: Buff) => {
+          let buffValue = Number(buff.value) || null;
+          if (buffValue) {
+            statBuffTotal += buffValue;
+          }
+        });
+
         return characterStatValue + statBuffTotal
       } else {
         return characterStatValue;
