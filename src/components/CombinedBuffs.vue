@@ -5,6 +5,8 @@
         -------------------
         <BonusList :bonuses="character.selfBuffs" @changed="this.selectedSelfBuffs = $event" />
         -------------------
+        <BonusList :bonuses="character.weaponBuffs" @changed="this.selectedWeaponBuffs = $event" />
+        -------------------
         <BonusList :bonuses="character.actions" @changed="this.selectedActions = $event" />
         -------------------
         <TemporaryBonuses @changed="this.temporaryBuffs = $event" />
@@ -37,6 +39,7 @@
       return {
         selectedSelfBuffs: [],
         selectedPartyBuffs: [],
+        selectedWeaponBuffs: [],
         selectedActions: [],
         temporaryBuffs: []
       }
@@ -48,7 +51,7 @@
         };
       },
       selectedBuffs() {
-        return this.selectedSelfBuffs.concat(this.selectedActions, this.selectedPartyBuffs, this.temporaryBuffs, this.weaponBonuses);
+        return this.selectedSelfBuffs.concat(this.selectedActions, this.selectedPartyBuffs, this.selectedWeaponBuffs, this.temporaryBuffs, this.weaponBonuses);
       },
       conditions() {
         return this.selectedBuffs.filter(b => b.conditions != null).flatMap(b => b.conditions);
@@ -109,20 +112,30 @@
               let newBuff = {
                 'name': buff.name,
                 'value': bonusValue,
-                'type': bonus.type
+                'type': bonus.type,
+                'stacks': bonus.stacks
               };
 
               if (combined.hasOwnProperty(combinedType)) {
                 let existingBuffs = combined[combinedType];
                 let existingIndex = existingBuffs.findIndex((existingBuff: Bonus) => bonus.type && existingBuff.type === bonus.type);
 
-                if (existingIndex < 0) {
+                if (existingIndex >= 0) {
+                  let existingBuff = existingBuffs[existingIndex];
+
+                  if (bonus.stacks || existingBuff.stacks) {
+                    //increase the value of the existing buff
+                    newBuff.value += existingBuff.value;
+                    combined[combinedType][existingIndex] = newBuff;
+                  } else if (bonusValue > existingBuff.value) {
+                    //replace with the newer larger buff
+                    combined[combinedType][existingIndex] = newBuff;
+                  }
+                } else {
                   //add a new type to the existing buffs
                   combined[combinedType].push(newBuff);
-                } else if (bonusValue > existingBuffs[existingIndex].value) {
-                  //replace with the newer larger buff
-                  combined[combinedType][existingIndex] = newBuff;
                 }
+
               } else {
                 //push a new type with the new buff
                 combined[combinedType] = [newBuff];

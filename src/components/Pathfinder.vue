@@ -71,7 +71,7 @@ export default defineComponent({
       characters : [
         {
           name: 'Deebo',
-          baseAttack: 8,
+          baseAttack: 9,
           str: 20,
           attacks:  [
             { name: 'Furious Adamantine Chainsaw +1', stat: 'str', type: 'melee2h', damageDice: '3d6', crit: 15,
@@ -80,7 +80,7 @@ export default defineComponent({
                 { attackMod: 3, damageMod: 3, type: 'training' },
                 { attackMod: -1, type: 'buckler' }
               ],
-              conditionalBonuses: [ {condition: 'raging', bonuses: [ { attackMod: 3, damageMod: 3, type: 'enh' }] }]
+              conditionalBonuses: [ {condition: 'raging', bonuses: [ { attackMod: 2, damageMod: 2, type: 'enh', stacks: true }] }]
             },
             { name: 'Bardiche', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Kukri', stat: 'str', type: 'melee1h', damageDice: '1d4', crit: 18 },
@@ -95,7 +95,22 @@ export default defineComponent({
             { name: 'rage', conditions: ['raging'], bonuses: [ { str: 4, type: 'morale' } ] },
             { name: 'power attack', bonuses: [ { meleeAttack: -3, damage1h: +6, damage2h: +9  } ] },
             { name: 'robot slayer', bonuses: [ { attackMod: 1, type: 'trait' }]},
-            { name: 'elemental blood', bonuses: [ { damageDice: '1d6', type: 'electricity' } ] }
+            { name: 'elemental blood', bonuses: [ { damageDice: '1d6', type: 'electricity' } ] },
+          ] as Array<Buff>,
+          weaponBuffs : [
+            { name: 'bane', bonuses: [ 
+              { attackMod: 4, damageMod: 4, type: 'enh', stacks: true },
+              { damageDice: '2d6' }]
+            },
+            { name: '+1 weapon spirit', bonuses: [
+              { attackMod: 1, damageMod: 1, type: 'enh', stacks: true }]
+            },
+            { name: '+2 weapon spirit', bonuses: [
+              { attackMod: 2, damageMod: 2, type: 'enh', stacks: true }]
+            },
+            { name: '+3 weapon spirit', bonuses: [
+              { attackMod: 3, damageMod: 2, type: 'enh', stacks: true }]
+            },
           ] as Array<Buff>,
           actions: [
             { name: 'charge', bonuses: [ { meleeAttack: 2 } ] },
