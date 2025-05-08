@@ -5,7 +5,7 @@
         -------------------
         <BonusList :bonuses="character.selfBuffs" @changed="this.selectedSelfBuffs = $event" />
         -------------------
-        <BonusList :bonuses="character.weaponBuffs" @changed="this.selectedWeaponBuffs = $event" />
+        <BonusList :bonuses="character.weaponBuffs" @changed="this.selectedWeaponBuffs = $event" :select-one="true" />
         -------------------
         <BonusList :bonuses="character.actions" @changed="this.selectedActions = $event" />
         -------------------
