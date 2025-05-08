@@ -1,7 +1,6 @@
 <template>
   <div v-for="bonus in bonuses">
-    <input v-if="selectOne" type="radio" :value="bonus" :id="bonus.name" v-model="selectedBuff" v-on:click="clearIfNecessary">
-    <input v-else type="checkbox" :value="bonus" :id="bonus.name" v-model="selectedBuffs">
+    <input type="checkbox" :value="bonus" :id="bonus.name" v-model="selectedBuffs" v-on:click="clearIfNecessary">
     <label :for="bonus.name">{{bonus.name}}</label>
   </div>
 
@@ -23,21 +22,14 @@ export default defineComponent({
   },
   data() {
     return {
-      selectedBuff: null,
       selectedBuffs: []
     }
   },
   methods: {
     clearIfNecessary(event) {
-      if (this.selectOne) {
-        var newSelection = event.target._value;
-        if (this.selectedBuff && this.selectedBuff.name == newSelection.name) {
-          // clear radio button when clicked again
-          this.selectedBuffs = [ ];
-          this.selectedBuff = null;
-        } else {
-          this.selectedBuffs = [ newSelection];
-        }
+      if (this.selectOne && event.target.checked) {
+        // clear other selections
+        this.selectedBuffs = [ event.target._value];
       }
     },
   },
