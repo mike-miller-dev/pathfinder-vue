@@ -84,11 +84,25 @@ export default defineComponent({
             },
             { name: 'Dwarven Thrower', stat: 'str', type: 'melee2h', damageDice: 'd10',
               bonuses: [
-                { attackMod: 2, damageMod: 2, type: 'enh' }
-              ]},
-            { name: 'Bardiche', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 19},
-            { name: 'Kukri', stat: 'str', type: 'melee1h', damageDice: '1d4', crit: 18 },
-            { name: 'Claws', stat: 'str', type: 'melee1h', damageDice: '1d6', attacks: 2 },
+                { attackMod: 2, damageMod: 2, type: 'enh' },
+                { attackMod: -1, type: 'buckler' }
+              ]
+            },
+            { name: 'Bardiche', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 19,
+              bonuses: [
+                { attackMod: -1, type: 'buckler' }
+              ]
+            },
+            { name: 'Kukri', stat: 'str', type: 'melee1h', damageDice: '1d4', crit: 18,
+              bonuses: [
+                { attackMod: -1, type: 'buckler' }
+              ]
+             },
+            { name: 'Claws', stat: 'str', type: 'melee1h', damageDice: '1d6', attacks: 2,
+              bonuses: [
+                { attackMod: -1, type: 'buckler' }
+              ]
+             },
           ] as Array<CharacterAttack>,
           partyBuffs : [
             {  name: 'flagbearer',  bonuses: [ { attackMod: 1, damageMod: 1, fearSave: 1, charmSave: 1, type: 'morale' } ] },
@@ -105,7 +119,7 @@ export default defineComponent({
           weaponBuffs : [
             { name: 'bane', bonuses: [ 
               { attackMod: 4, damageMod: 4, type: 'enh', stacks: true },
-              { damageDice: '2d6' }]
+              { damageDice: '2d6', nested: true }]
             },
             { name: '+1 weapon spirit', bonuses: [
               { attackMod: 1, damageMod: 1, type: 'enh', stacks: true }]
@@ -185,17 +199,37 @@ export default defineComponent({
 
       return damageString;
     },
+    nestedDamageDice() {
+      let extraDamageString = '';
+
+      let damageDice = this.getBuffs('damageDice');
+      damageDice.forEach((buff: Buff) => {
+        if (buff.nested) {
+          let damageString = this.parseBuff(buff);
+
+          if (damageString.startsWith('-')) {
+            extraDamageString += `-${damageString.substring(1)}`
+          } else {
+            extraDamageString += `+${damageString}`
+          }
+        }
+      });
+
+      return extraDamageString;
+    },
     bonusDamageDice() {
       let extraDamageString = '';
 
       let damageDice = this.getBuffs('damageDice');
       damageDice.forEach((buff: Buff) => {
-        let damageString = this.parseBuff(buff);
+        if (!buff.nested) {
+          let damageString = this.parseBuff(buff);
 
-        if (damageString.startsWith('-')) {
-          extraDamageString += `-[[${damageString.substring(1)}]]`
-        } else {
-          extraDamageString += `+[[${damageString}]]`
+          if (damageString.startsWith('-')) {
+            extraDamageString += `-[[${damageString.substring(1)}]]`
+          } else {
+            extraDamageString += `+[[${damageString}]]`
+          }
         }
       });
 
@@ -260,7 +294,7 @@ export default defineComponent({
       return fullAttacks;
     },
     fullDamage() {
-      var attack = `${this.selectedAttack.damageDice}+${this.damageStatBonus}[${this.selectedAttack.stat}]${this.damageBuffs}`
+      var attack = `${this.selectedAttack.damageDice}+${this.damageStatBonus}[${this.selectedAttack.stat}]${this.damageBuffs}${this.nestedDamageDice}`
       return `[[ ${attack} ]]${this.bonusDamageDice} dmg`;
     },
     fullAttackMacro() {
@@ -294,7 +328,7 @@ export default defineComponent({
         }
       });
 
-      return `[[${damageRoll}+${damageBonus}${extraDamageString}]]${this.bonusDamageDice}`;
+      return `[[${damageRoll}+${damageBonus}${extraDamageString}${this.nestedDamageDice}]]${this.bonusDamageDice}`;
     },
   },
   setup() {

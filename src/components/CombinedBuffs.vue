@@ -113,7 +113,8 @@
                 'name': buff.name,
                 'value': bonusValue,
                 'type': bonus.type,
-                'stacks': bonus.stacks
+                'stacks': bonus.stacks,
+                'nested': bonus.nested
               };
 
               if (combined.hasOwnProperty(combinedType)) {
