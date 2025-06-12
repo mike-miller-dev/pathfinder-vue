@@ -82,6 +82,10 @@ export default defineComponent({
               ],
               conditionalBonuses: [ {condition: 'raging', bonuses: [ { attackMod: 2, damageMod: 2, type: 'enh', stacks: true }] }]
             },
+            { name: 'Dwarven Thrower', stat: 'str', type: 'melee2h', damageDice: 'd10',
+              bonuses: [
+                { attackMod: 2, damageMod: 2, type: 'enh' }
+              ]},
             { name: 'Bardiche', stat: 'str', type: 'melee2h', damageDice: 'd10', crit: 19},
             { name: 'Kukri', stat: 'str', type: 'melee1h', damageDice: '1d4', crit: 18 },
             { name: 'Claws', stat: 'str', type: 'melee1h', damageDice: '1d6', attacks: 2 },
@@ -89,6 +93,7 @@ export default defineComponent({
           partyBuffs : [
             {  name: 'flagbearer',  bonuses: [ { attackMod: 1, damageMod: 1, fearSave: 1, charmSave: 1, type: 'morale' } ] },
             {  name: 'inspire courage',  bonuses: [ { attackMod: 3, damageMod: 3, fearSave: 3, type: 'competence' } ] },
+            {  name: 'good hope',  bonuses: [ { attackMod: 2, damageMod: 2, fearSave: 2, charmSave: 2, type: 'morale' } ] },
             { name: 'haste', bonuses: [ { attackMod: 1, extraAttacks: 1 } ] },
           ] as Array<Buff>,
           selfBuffs : [
