@@ -276,7 +276,7 @@ export default defineComponent({
         } else if (extraAttack.value > 1) {
           for (var i = 0; i < extraAttack.value; i++) {
             fullAttacks.push({
-              name: extraAttack.name + ' ' + (i+1),
+              name: `${extraAttack.name} ${i+1}`,
               value: this.baseAttacks[0]
             });
           }
@@ -385,11 +385,12 @@ export default defineComponent({
       }
 
       let buffValue = Number(buff.value) || null;
-      let sign = (buffValue && buff.value >= 0)
+      let sign = (buffValue && buffValue > 0)
         ? '+'
         : '';
 
-      return `${sign}${buff.value}[${buff.name ? buff.name : ''}${buff.name && buff.type ? ' ' : ''}${buff.type ? buff.type : ''}]`;
+      // filter with join adds a space only if both are non-empty
+      return `${sign}${buff.value}[${[buff.name, buff.type].filter(Boolean).join(" ")}]`;
     },
     selectFirstAttack() {
       this.selectedAttack = (this.selectedCharacter && this.selectedCharacter.attacks)
