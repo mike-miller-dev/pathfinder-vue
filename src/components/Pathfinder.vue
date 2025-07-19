@@ -25,7 +25,7 @@
 
         <div>
           <input type="checkbox" :id="crit-confirmation" :value="isCritConfirmationChecked" v-model="isCritConfirmationChecked" :disabled="isFullAttack">
-          <label :for="crit-confirmation">crit confirmation</label>
+          <label :for="crit-confirmation" :class="isFullAttack ? 'disabled': ''">crit confirmation</label>
         </div>
 
         -------------------
@@ -448,5 +448,8 @@ export default defineComponent({
   }
   input {
     margin-right: 3px;
+  }
+  label.disabled {
+    color: #7676764d;
   }
 </style>
