@@ -22,7 +22,13 @@
 
         <Slider v-if="fullAttacks.length > 1" :value="isFullAttack" @changed="isFullAttack = $event" />
         <br />
-        <br />
+
+        <div>
+          <input type="checkbox" :id="crit-confirmation" :value="isCritConfirmationChecked" v-model="isCritConfirmationChecked" :disabled="isFullAttack">
+          <label :for="crit-confirmation">crit confirmation</label>
+        </div>
+
+        -------------------
 
         <div v-for="(iterative, i) in fullAttacks">
           <div v-if="isFullAttack">
@@ -67,6 +73,7 @@ export default defineComponent({
       selectedAttack: null,
       combinedBuffs: [],
       isFullAttack: true,
+      isCritConfirmationChecked: false,
       selectedIterativeIndex: 0,
       characters : [
         {
@@ -146,6 +153,9 @@ export default defineComponent({
     this.selectFirstAttack();
   },
   computed: {
+    isCritConfirmation() {
+      return this.isCritConfirmationChecked && !this.isFullAttack;
+    },
     extraAttacks() {
       return this.combinedBuffs['extraAttacks']
     },
@@ -202,6 +212,10 @@ export default defineComponent({
     nestedDamageDice() {
       let extraDamageString = '';
 
+      if (this.isCritConfirmation && !this.isFullAttack) {
+        return extraDamageString;
+      }
+
       let damageDice = this.getBuffs('damageDice');
       damageDice.forEach((buff: Buff) => {
         if (buff.nested) {
@@ -219,6 +233,10 @@ export default defineComponent({
     },
     bonusDamageDice() {
       let extraDamageString = '';
+
+      if (this.isCritConfirmation && !this.isFullAttack) {
+        return extraDamageString;
+      }
 
       let damageDice = this.getBuffs('damageDice');
       damageDice.forEach((buff: Buff) => {
@@ -262,7 +280,7 @@ export default defineComponent({
 
       //first attack
       fullAttacks.push({
-        name: `attack ${this.baseAttacks.length > 1 ? ' 1' : ''}`,
+        name: `${this.isCritConfirmation ? 'crit confirm ' : ''}attack ${this.baseAttacks.length > 1 ? ' 1' : ''}`,
         value: this.baseAttacks[0]
       });
 
@@ -270,13 +288,13 @@ export default defineComponent({
         let extraAttack = this.extraAttacks[extraAttackIndex];
         if (extraAttack.value == 1) {
           fullAttacks.push({
-            name: extraAttack.name,
+            name: `${this.isCritConfirmation ? 'crit confirm ' : ''}${extraAttack.name}`,
             value: this.baseAttacks[0]
           });
         } else if (extraAttack.value > 1) {
           for (var i = 0; i < extraAttack.value; i++) {
             fullAttacks.push({
-              name: `${extraAttack.name} ${i+1}`,
+              name: `${this.isCritConfirmation ? 'crit confirm ' : ''}${extraAttack.name} ${i+1}`,
               value: this.baseAttacks[0]
             });
           }
@@ -286,7 +304,7 @@ export default defineComponent({
       for (var i = 1; i < this.baseAttacks.length; i++) {
         let iterative = this.baseAttacks[i];
         fullAttacks.push({
-          name: `attack ${i+1}`,
+          name: `${this.isCritConfirmation ? 'crit confirm ' : ''}attack ${i+1}`,
           value: iterative
         });
       }
