@@ -187,7 +187,13 @@ export default defineComponent({
         return this.selectedAttack.damageDice;
       }
 
-      let currentIndex = this.weaponDamageTable.indexOf(this.selectedAttack.damageDice);
+      let damageDice = this.selectedAttack.damageDice;
+      if (damageDice.startsWith('d')) {
+        // treat d4 as 1d4 so that we can find it in the table
+        damageDice = '1'+damageDice;
+      }
+
+      let currentIndex = this.weaponDamageTable.indexOf(damageDice);
       if (currentIndex < 0) {
         // not found, keep current damage
         return this.selectedAttack.damageDice;
