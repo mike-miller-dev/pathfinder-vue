@@ -157,6 +157,9 @@
       combinedBonuses: function (newVal) {
         this.$emit('changed', newVal);
       },
+      conditions: function (newVal) {
+        this.$emit('conditions-changed', newVal);
+      }
     },
     methods: {
       isLarger(oldVal: Number, newVal: Number) {

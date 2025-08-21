@@ -8,8 +8,7 @@
     </select>
 
     <div v-if="selectedCharacter">
-
-      <CombinedBuffs :character="selectedCharacter" :selected-attack="selectedAttack" @changed="combinedBuffs = $event" />
+      <CombinedBuffs :character="selectedCharacter" :selected-attack="selectedAttack" @changed="combinedBuffs = $event" @conditions-changed="conditions = $event"/>
 
       <div>
         <select v-model="selectedAttack">
@@ -72,6 +71,7 @@ export default defineComponent({
       selectedCharacter: null,
       selectedAttack: null,
       combinedBuffs: [],
+      conditions: [],
       isFullAttack: true,
       isCritConfirmationChecked: false,
       selectedIterativeIndex: 0,
@@ -87,7 +87,11 @@ export default defineComponent({
                 { attackMod: 3, damageMod: 3, type: 'training' },
                 { attackMod: -1, type: 'buckler' }
               ],
-              conditionalBonuses: [ {condition: 'raging', bonuses: [ { attackMod: 2, damageMod: 2, type: 'enh', stacks: true }] }]
+              conditionalBonuses: [
+                {condition: 'raging', bonuses: [ { attackMod: 2, damageMod: 2, type: 'enh', stacks: true }] },
+                {condition: 'enlarged', damageDice: '4d6' },
+                {condition: 'isCritConfirm', bonuses: [ { attackMod: 4 }] }
+              ]
             },
             { name: 'Dwarven Thrower', stat: 'str', type: 'melee2h', damageDice: 'd10',
               bonuses: [
@@ -118,6 +122,7 @@ export default defineComponent({
             { name: 'haste', bonuses: [ { attackMod: 1, extraAttacks: 1 } ] },
           ] as Array<Buff>,
           selfBuffs : [
+            { name: 'enlarge', conditions: ['enlarged'], bonuses: [ { str: 2, type: 'size' }, { attackMod: -1, type: 'size' } ] },
             { name: 'rage', conditions: ['raging'], bonuses: [ { str: 4, type: 'morale' } ] },
             { name: 'power attack', bonuses: [ { meleeAttack: -3, damage1h: +6, damage2h: +9  } ] },
             { name: 'robot slayer', bonuses: [ { attackMod: 1, type: 'trait' }]},
@@ -145,6 +150,27 @@ export default defineComponent({
           ] as Array<Buff>,
         },
       ] as Array<Character>,
+      weaponDamageTable: [
+        '1d2',
+        '1d3',
+        '1d4',
+        '1d6',
+        '1d8',
+        '1d10',
+        '2d6',
+        '2d8',
+        '3d6',
+        '3d8',
+        '4d6',
+        '4d8',
+        '6d6',
+        '6d8',
+        '8d6',
+        '8d8',
+        '12d6',
+        '12d8',
+        '16d6'
+      ],
     };
   },
   mounted() {
@@ -153,6 +179,26 @@ export default defineComponent({
     this.selectFirstAttack();
   },
   computed: {
+    isEnlarged() {
+        return this.conditions.indexOf('enlarged') >= 0;
+    },
+    sizedDamage() {
+      if (!this.isEnlarged) {
+        return this.selectedAttack.damageDice;
+      }
+
+      let currentIndex = this.weaponDamageTable.indexOf(this.selectedAttack.damageDice);
+      if (currentIndex < 0) {
+        // not found, keep current damage
+        return this.selectedAttack.damageDice;
+      } else if ((currentIndex +2) <= this.weaponDamageTable.length) {
+        // can increase by 2 steps
+        return this.weaponDamageTable[currentIndex+2];
+      } else {
+        // cannot increase by 2 steps, return max instead
+        return this.weaponDamageTable[this.weaponDamageTable.length-1];
+      }
+    },
     isCritConfirmation() {
       return this.isCritConfirmationChecked && !this.isFullAttack;
     },
@@ -312,7 +358,7 @@ export default defineComponent({
       return fullAttacks;
     },
     fullDamage() {
-      var attack = `${this.selectedAttack.damageDice}+${this.damageStatBonus}[${this.selectedAttack.stat}]${this.damageBuffs}${this.nestedDamageDice}`
+      var attack = `${this.sizedDamage}+${this.damageStatBonus}[${this.selectedAttack.stat}]${this.damageBuffs}${this.nestedDamageDice}`
       return `[[ ${attack} ]]${this.bonusDamageDice} dmg`;
     },
     fullAttackMacro() {
@@ -329,7 +375,7 @@ export default defineComponent({
       return macro;
     },
     simpleDamageRoll() {
-      var damageRoll = this.selectedAttack.damageDice;
+      var damageRoll = this.sizedDamage;
       var damageBonus = this.damageStatBonus;
 
       let extraDamageString = '';
