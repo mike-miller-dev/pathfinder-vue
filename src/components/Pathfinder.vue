@@ -79,7 +79,7 @@ export default defineComponent({
         {
           name: 'Deebo',
           baseAttack: 10,
-          str: 20,
+          str: 24,
           attacks:  [
             { name: 'Furious Adamantine Chainsaw +1', stat: 'str', type: 'melee2h', damageDice: '3d6', crit: 15,
               bonuses: [
@@ -89,7 +89,6 @@ export default defineComponent({
               ],
               conditionalBonuses: [
                 {condition: 'raging', bonuses: [ { attackMod: 2, damageMod: 2, type: 'enh', stacks: true }] },
-                {condition: 'enlarged', damageDice: '4d6' },
                 {condition: 'isCritConfirm', bonuses: [ { attackMod: 4 }] }
               ]
             },
