@@ -83,7 +83,7 @@ export default defineComponent({
           attacks:  [
             { name: 'Furious Adamantine Chainsaw +2', stat: 'str', type: 'melee2h', damageDice: '3d6', crit: 15,
               bonuses: [
-                { attackMod: 1, damageMod: 2, type: 'enh' },
+                { attackMod: 2, damageMod: 2, type: 'enh' },
                 { attackMod: 3, damageMod: 3, type: 'training' },
                 { attackMod: -1, type: 'buckler' }
               ],
