@@ -115,9 +115,9 @@ export default defineComponent({
              },
           ] as Array<CharacterAttack>,
           partyBuffs : [
-            {  name: 'flagbearer',  bonuses: [ { attackMod: 1, damageMod: 1, fearSave: 1, charmSave: 1, type: 'morale' } ] },
-            {  name: 'inspire courage',  bonuses: [ { attackMod: 3, damageMod: 3, fearSave: 3, type: 'competence' } ] },
-            {  name: 'good hope',  bonuses: [ { attackMod: 2, damageMod: 2, fearSave: 2, charmSave: 2, type: 'morale' } ] },
+            { name: 'flagbearer',  bonuses: [ { attackMod: 1, damageMod: 1, fearSave: 1, charmSave: 1, type: 'morale' } ] },
+            { name: 'inspire courage',  bonuses: [ { attackMod: 3, damageMod: 3, fearSave: 3, type: 'competence' } ] },
+            { name: 'good hope',  bonuses: [ { attackMod: 2, damageMod: 2, fearSave: 2, charmSave: 2, type: 'morale' } ] },
             { name: 'haste', bonuses: [ { attackMod: 1, extraAttacks: 1 } ] },
           ] as Array<Buff>,
           selfBuffs : [
