@@ -78,7 +78,7 @@ export default defineComponent({
       characters : [
         {
           name: 'Deebo',
-          baseAttack: 10,
+          baseAttack: 11,
           str: 24,
           attacks:  [
             { name: 'Furious Adamantine Chainsaw +2', stat: 'str', type: 'melee2h', damageDice: '3d6', crit: 15,
@@ -88,8 +88,8 @@ export default defineComponent({
                 { attackMod: -1, type: 'buckler' }
               ],
               conditionalBonuses: [
-                {condition: 'raging', bonuses: [ { attackMod: 2, damageMod: 2, type: 'enh', stacks: true }] },
-                {condition: 'isCritConfirm', bonuses: [ { attackMod: 4 }] }
+                { condition: 'raging', bonuses: [ { attackMod: 2, damageMod: 2, type: 'enh', stacks: true }] },
+                { condition: 'isCritConfirm', bonuses: [ { attackMod: 4 }] }
               ]
             },
             { name: 'Dwarven Thrower', stat: 'str', type: 'melee2h', damageDice: 'd10',
