@@ -78,7 +78,7 @@ export default defineComponent({
       characters : [
         {
           name: 'Deebo',
-          baseAttack: 11,
+          baseAttack: 10,
           str: 24,
           attacks:  [
             { name: 'Furious Adamantine Chainsaw +2', stat: 'str', type: 'melee2h', damageDice: '3d6', crit: 15,
