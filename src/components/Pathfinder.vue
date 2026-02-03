@@ -114,39 +114,48 @@ export default defineComponent({
               ]
              },
           ] as Array<CharacterAttack>,
-          partyBuffs : [
-            { name: 'flagbearer',  bonuses: [ { attackMod: 1, damageMod: 1, fearSave: 1, charmSave: 1, type: 'morale' } ] },
-            { name: 'inspire courage',  bonuses: [ { attackMod: 3, damageMod: 3, fearSave: 3, type: 'competence' } ] },
-            { name: 'good hope',  bonuses: [ { attackMod: 2, damageMod: 2, fearSave: 2, charmSave: 2, type: 'morale' } ] },
-            { name: 'haste', bonuses: [ { attackMod: 1, extraAttacks: 1 } ] },
-          ] as Array<Buff>,
-          selfBuffs : [
-            { name: 'enlarge', conditions: ['enlarged'], bonuses: [ { str: 2, type: 'size' }, { attackMod: -1, type: 'size' } ] },
-            { name: 'rage', conditions: ['raging'], bonuses: [ { str: 4, type: 'morale' } ] },
-            { name: 'power attack', bonuses: [ { meleeAttack: -3, damage1h: +6, damage2h: +9  } ] },
-            { name: 'robot slayer', bonuses: [ { attackMod: 1, type: 'trait' }]},
-            { name: 'elemental blood', bonuses: [ { damageDice: '1d6', type: 'electricity' } ] },
-          ] as Array<Buff>,
-          weaponBuffs : [
-            { name: 'bane', bonuses: [ 
-              { attackMod: 4, damageMod: 4, type: 'enh', stacks: true },
-              { damageDice: '2d6', nested: true }]
-            },
-            { name: '+1 weapon spirit', bonuses: [
-              { attackMod: 1, damageMod: 1, type: 'enh', stacks: true }]
-            },
-            { name: '+2 weapon spirit', bonuses: [
-              { attackMod: 2, damageMod: 2, type: 'enh', stacks: true }]
-            },
-            { name: '+3 weapon spirit', bonuses: [
-              { attackMod: 3, damageMod: 2, type: 'enh', stacks: true }]
-            },
-          ] as Array<Buff>,
-          actions: [
-            { name: 'charge', bonuses: [ { meleeAttack: 2 } ] },
-            { name: 'flanking', bonuses: [ { meleeAttack: 2 }]},
-            { name: 'fighting defensively', bonuses: [ { meleeAttack: -4  } ] },
-          ] as Array<Buff>,
+          buffs: [
+            [ // party buffs
+              { name: 'flagbearer',  bonuses: [ { attackMod: 1, damageMod: 1, fearSave: 1, charmSave: 1, type: 'morale' } ] },
+              { name: 'inspire courage',  bonuses: [ { attackMod: 3, damageMod: 3, fearSave: 3, type: 'competence' } ] },
+              { name: 'good hope',  bonuses: [ { attackMod: 2, damageMod: 2, fearSave: 2, charmSave: 2, type: 'morale' } ] },
+              { name: 'haste', bonuses: [ { attackMod: 1, extraAttacks: 1 } ] },
+            ] as Array<Buff>,
+
+            [ //self buffs
+              { name: 'enlarge', conditions: ['enlarged'], bonuses: [ { str: 2, type: 'size' }, { attackMod: -1, type: 'size' } ] },
+              { name: 'rage', conditions: ['raging'], bonuses: [ { str: 4, type: 'morale' } ] },
+              { name: 'power attack', bonuses: [ { meleeAttack: -3, damage1h: +6, damage2h: +9  } ] },
+              { name: 'elemental blood', bonuses: [ { damageDice: '1d6', type: 'electricity' } ] },
+            ] as Array<Buff>,
+
+            [ // vs enemies
+              { name: 'robot slayer', bonuses: [ { attackMod: 1, type: 'trait' }]},
+            ] as Array<Buff>,
+
+
+            [ //weapon buffs
+              { name: 'bane', bonuses: [
+                { attackMod: 4, damageMod: 4, type: 'enh', stacks: true },
+                { damageDice: '2d6', nested: true }]
+              },
+              { name: '+1 weapon spirit', bonuses: [
+                { attackMod: 1, damageMod: 1, type: 'enh', stacks: true }]
+              },
+              { name: '+2 weapon spirit', bonuses: [
+                { attackMod: 2, damageMod: 2, type: 'enh', stacks: true }]
+              },
+              { name: '+3 weapon spirit', bonuses: [
+                { attackMod: 3, damageMod: 2, type: 'enh', stacks: true }]
+              },
+            ] as Array<Buff>,
+
+            [ // actions
+              { name: 'charge', bonuses: [ { meleeAttack: 2 } ] },
+              { name: 'flanking', bonuses: [ { meleeAttack: 2 }]},
+              { name: 'fighting defensively', bonuses: [ { meleeAttack: -4  } ] },
+            ] as Array<Buff>
+          ],
         },
       ] as Array<Character>,
       weaponDamageTable: [
