@@ -7,12 +7,13 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
+import type { Buff } from "@/models/Buff";
 export default defineComponent({
   name: 'BonusList',
   emits: ["changed"],
   props : {
     bonuses : {
-      type: Array,
+      type: Array<Buff>,
       required: true
     },
     selectOne: {
@@ -34,7 +35,7 @@ export default defineComponent({
     },
   },
   watch: {
-    selectedBuffs: function (newVal) {
+    selectedBuffs: function (newVal: Array<Buff>) {
       this.$emit('changed', newVal);
     }
   },

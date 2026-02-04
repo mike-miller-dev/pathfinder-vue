@@ -17,6 +17,7 @@
   import { defineComponent } from 'vue'
   import Bonus from '@/models/Bonus.vue';
   import BonusList from './BonusList.vue';
+  import Buff from '@/models/Buff.vue';
   import TemporaryBonuses from './TemporaryBonuses.vue';
   export default defineComponent({
     name: 'CombinedBuffs',
@@ -37,11 +38,11 @@
     },
     data() {
       return {
-        selectedSelfBuffs: [],
-        selectedPartyBuffs: [],
-        selectedWeaponBuffs: [],
-        selectedActions: [],
-        temporaryBuffs: []
+        selectedSelfBuffs: [] as Array<Buff>,
+        selectedPartyBuffs: [] as Array<Buff>,
+        selectedWeaponBuffs: [] as Array<Buff>,
+        selectedActions: [] as Array<Buff>,
+        temporaryBuffs: [] as Array<Buff>
       }
     },
     computed: {
@@ -54,7 +55,7 @@
         return this.selectedSelfBuffs.concat(this.selectedActions, this.selectedPartyBuffs, this.selectedWeaponBuffs, this.temporaryBuffs, this.weaponBonuses);
       },
       conditions() {
-        return this.selectedBuffs.filter(b => b.conditions != null).flatMap(b => b.conditions);
+        return this.selectedBuffs.filter((b: Buff) => b.conditions != null).flatMap((b: Buff) => b.conditions);
       },
       appliedConditionals() {
           if(!this.selectedAttack || !this.selectedAttack.conditionalBonuses) {
