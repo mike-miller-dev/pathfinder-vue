@@ -1,11 +1,16 @@
 <template>
     <div v-if="character">
-      <div v-for="buffList in character.buffs">
-        <BonusList :bonuses="buffList" @changed="this.selectedPartyBuffs = $event" />
         -------------------
-      </div>
-      <TemporaryBonuses @changed="this.temporaryBuffs = $event" />
-      -------------------
+        <BonusList :bonuses="character.partyBuffs" @changed="this.selectedPartyBuffs = $event" />
+        -------------------
+        <BonusList :bonuses="character.selfBuffs" @changed="this.selectedSelfBuffs = $event" />
+        -------------------
+        <BonusList :bonuses="character.weaponBuffs" @changed="this.selectedWeaponBuffs = $event" :select-one="true" />
+        -------------------
+        <BonusList :bonuses="character.actions" @changed="this.selectedActions = $event" />
+        -------------------
+        <TemporaryBonuses @changed="this.temporaryBuffs = $event" />
+        -------------------
     </div>
 </template>
 <script lang="ts">
