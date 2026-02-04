@@ -20,7 +20,7 @@
   import TemporaryBonuses from './TemporaryBonuses.vue';
   export default defineComponent({
     name: 'CombinedBuffs',
-    emits: ["changed"],
+    emits: ["changed", "conditions-changed"],
     components: {
       BonusList,
       TemporaryBonuses

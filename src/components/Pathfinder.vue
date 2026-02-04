@@ -23,8 +23,8 @@
         <br />
 
         <div>
-          <input type="checkbox" :id="crit-confirmation" :value="isCritConfirmationChecked" v-model="isCritConfirmationChecked" :disabled="isFullAttack">
-          <label :for="crit-confirmation" :class="isFullAttack ? 'disabled': ''">crit confirmation</label>
+          <input type="checkbox" id="crit-confirmation" :value="isCritConfirmationChecked" v-model="isCritConfirmationChecked" :disabled="isFullAttack">
+          <label for="crit-confirmation" :class="isFullAttack ? 'disabled': ''">crit confirmation</label>
         </div>
 
         -------------------
