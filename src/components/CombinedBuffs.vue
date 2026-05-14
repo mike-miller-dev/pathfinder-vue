@@ -1,24 +1,26 @@
 <template>
     <div v-if="character">
         -------------------
-        <BonusList :bonuses="character.partyBuffs" @changed="this.selectedPartyBuffs = $event" />
+        <BonusList :bonuses="character.partyBuffs" @changed="selectedPartyBuffs = $event" />
         -------------------
-        <BonusList :bonuses="character.selfBuffs" @changed="this.selectedSelfBuffs = $event" />
+        <BonusList :bonuses="character.selfBuffs" @changed="selectedSelfBuffs = $event" />
         -------------------
-        <BonusList :bonuses="character.weaponBuffs" @changed="this.selectedWeaponBuffs = $event" :select-one="true" />
+        <BonusList :bonuses="character.weaponBuffs" @changed="selectedWeaponBuffs = $event" :select-one="true" />
         -------------------
-        <BonusList :bonuses="character.actions" @changed="this.selectedActions = $event" />
+        <BonusList :bonuses="character.actions" @changed="selectedActions = $event" />
         -------------------
-        <TemporaryBonuses @changed="this.temporaryBuffs = $event" />
+        <TemporaryBonuses @changed="temporaryBuffs = $event" />
         -------------------
     </div>
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue'
-  import Bonus from '@/models/Bonus.vue';
   import BonusList from './BonusList.vue';
-  import Buff from '@/models/Buff.vue';
   import TemporaryBonuses from './TemporaryBonuses.vue';
+  import type { Bonus } from "@/models/Bonus";
+  import type { Buff } from "@/models/Buff";
+  import type { Character } from '@/models/Character';
+  import type { CharacterAttack } from '@/models/CharacterAttack';
   export default defineComponent({
     name: 'CombinedBuffs',
     emits: ["changed", "conditions-changed"],
@@ -28,11 +30,11 @@
     },
     props : {
       character : {
-        type: Object,
+        type: Object as Character,
         required: true
       },
       selectedAttack : {
-        type: Object,
+        type: Object as CharacterAttack,
         required: true
       },
     },
