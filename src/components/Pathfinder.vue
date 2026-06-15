@@ -123,7 +123,7 @@ export default defineComponent({
           selfBuffs : [
             { name: 'enlarge', conditions: ['enlarged'], bonuses: [ { str: 2, type: 'size' }, { attackMod: -1, type: 'size' } ] },
             { name: 'rage', conditions: ['raging'], bonuses: [ { str: 4, type: 'morale' } ] },
-            { name: 'power attack', bonuses: [ { meleeAttack: -3, damage1h: +6, damage2h: +9  } ] },
+            { name: 'power attack', bonuses: [ { meleeAttack: -4, damage1h: +8, damage2h: +12  } ] },
             { name: 'robot slayer', bonuses: [ { attackMod: 1, type: 'trait' }]},
             { name: 'elemental blood', bonuses: [ { damageDice: '1d6', type: 'electricity' } ] },
           ] as Array<Buff>,
