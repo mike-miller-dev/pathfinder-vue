@@ -67,15 +67,7 @@ export default defineComponent({
     Slider
 },
   data() {
-    return {
-      selectedCharacter: null as Character,
-      selectedAttack: null,
-      combinedBuffs: [],
-      conditions: [],
-      isFullAttack: true,
-      isCritConfirmationChecked: false,
-      selectedIterativeIndex: 0,
-      characters : [
+    const characters = [
         {
           name: 'Deebo',
           baseAttack: 13,
@@ -148,7 +140,17 @@ export default defineComponent({
             { name: 'fighting defensively', bonuses: [ { meleeAttack: -4  } ] },
           ] as Array<Buff>,
         },
-      ] as Array<Character>,
+      ] as Array<Character>;
+
+    return {
+      selectedCharacter: characters[0] ?? null,
+      selectedAttack: characters[0]?.attacks[0] ?? null,
+      combinedBuffs: [],
+      conditions: [],
+      isFullAttack: true,
+      isCritConfirmationChecked: false,
+      selectedIterativeIndex: 0,
+      characters,
       weaponDamageTable: [
         '1d2',
         '1d3',
@@ -171,10 +173,6 @@ export default defineComponent({
         '16d6'
       ],
     };
-  },
-  mounted() {
-    this.selectedCharacter = this.characters[0] ?? null;
-    this.selectFirstAttack();
   },
   computed: {
     isEnlarged() {
