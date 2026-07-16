@@ -57,6 +57,7 @@ import { defineComponent } from 'vue'
 import CombinedBuffs from './CombinedBuffs.vue';
 import Slider from './Slider.vue';
 import type { Buff } from "@/models/Buff";
+import type { CombinedBuff } from "@/models/CombinedBuff";
 import type { Character } from "@/models/Character";
 import type { CharacterAttack } from "@/models/CharacterAttack";
 import type { IterativeAttack } from "@/models/IterativeAttack";
@@ -145,8 +146,8 @@ export default defineComponent({
     return {
       selectedCharacter: characters[0] ?? null,
       selectedAttack: characters[0]?.attacks[0] ?? null,
-      combinedBuffs: [],
-      conditions: [],
+      combinedBuffs: {} as Record<string, Array<CombinedBuff>>,
+      conditions: [] as Array<string>,
       isFullAttack: true,
       isCritConfirmationChecked: false,
       selectedIterativeIndex: 0,
@@ -220,7 +221,7 @@ export default defineComponent({
       const stat = this.selectedAttack.stat;
       const statBuffs = this.combinedBuffs?.[stat] ?? [];
       return statBuffs.reduce(
-        (total: number, buff: Buff) => total + (Number(buff.value) || 0),
+        (total: number, buff: CombinedBuff) => total + (Number(buff.value) || 0),
         this.selectedCharacter[stat]
       );
     },
@@ -331,14 +332,14 @@ export default defineComponent({
     },
     // Splits a list of buffs into a numeric total (bonus) and a string of
     // non-numeric/dice modifiers (extra), e.g. "+1d6".
-    accumulateBuffs(buffs: Array<Buff>) {
+    accumulateBuffs(buffs: Array<CombinedBuff>) {
       let bonus = 0;
       let extra = '';
-      buffs.forEach((buff: Buff) => {
+      buffs.forEach((buff: CombinedBuff) => {
         const buffValue = Number(buff.value) || null;
         if (buffValue) {
           bonus += buffValue;
-        } else if (buff.value.startsWith('+') || buff.value.startsWith('-')) {
+        } else if (String(buff.value).startsWith('+') || String(buff.value).startsWith('-')) {
           extra += `${buff.value}`
         } else {
           extra += `+${buff.value}`
@@ -350,7 +351,7 @@ export default defineComponent({
     buffModString(buffName: string) {
       return this.getBuffs(buffName)
         .sort(this.compareBuffValues)
-        .map((buff: Buff) => ` ${this.parseBuff(buff)}`)
+        .map((buff: CombinedBuff) => ` ${this.parseBuff(buff)}`)
         .join('');
     },
     // Renders damageDice buffs. `nested` selects dice added inside the main damage
@@ -360,8 +361,8 @@ export default defineComponent({
         return '';
       }
       return this.getBuffs('damageDice')
-        .filter((buff: Buff) => !!buff.nested === nested)
-        .map((buff: Buff) => {
+        .filter((buff: CombinedBuff) => !!buff.nested === nested)
+        .map((buff: CombinedBuff) => {
           const damageString = this.parseBuff(buff);
           const negative = damageString.startsWith('-');
           const body = negative ? damageString.substring(1) : damageString;
@@ -370,8 +371,8 @@ export default defineComponent({
         })
         .join('');
     },
-    compareBuffValues(a: Buff, b: Buff) {
-        return b.value - a.value;
+    compareBuffValues(a: CombinedBuff, b: CombinedBuff) {
+        return Number(b.value) - Number(a.value);
     },
     getBuffs(buffName: string) {
       return this.combinedBuffs?.[buffName]?.flat() ?? [];
@@ -383,7 +384,7 @@ export default defineComponent({
     attackMacroLine(attack: IterativeAttack) {
       return `{{ ${attack.name}=${this.fullAttackString(attack.value)} for ${this.fullDamage}}}`;
     },
-    parseBuff(buff: Buff) {
+    parseBuff(buff: CombinedBuff) {
       if (!buff) {
         return '';
       }

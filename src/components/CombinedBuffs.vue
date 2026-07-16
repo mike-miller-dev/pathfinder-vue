@@ -19,6 +19,7 @@
   import TemporaryBonuses from './TemporaryBonuses.vue';
   import type { Bonus } from "@/models/Bonus";
   import type { Buff } from "@/models/Buff";
+  import type { CombinedBuff } from "@/models/CombinedBuff";
   import type { Character } from '@/models/Character';
   import type { CharacterAttack } from '@/models/CharacterAttack';
   export default defineComponent({
@@ -75,7 +76,7 @@
         return this.selectedAttack.type.toLowerCase().includes('range');
       },
       combinedBonuses() {
-        const combined = {};
+        const combined: Record<string, Array<CombinedBuff>> = {};
 
         for (const buff of this.allBonuses) {
           //example buff: { name: 'bulls strength', selected: true, bonuses: [{ strength: 4, type: 'enh'}] }
