@@ -173,13 +173,20 @@ export default defineComponent({
     };
   },
   mounted() {
-    this.selectedCharacter = this.characters.length > 0 ? this.characters[0] : null;
-
+    this.selectedCharacter = this.characters[0] ?? null;
     this.selectFirstAttack();
   },
   computed: {
     isEnlarged() {
-        return this.conditions.indexOf('enlarged') >= 0;
+      return this.conditions.includes('enlarged');
+    },
+    critPrefix() {
+      return this.isCritConfirmation ? 'crit confirm ' : '';
+    },
+    dieRoll() {
+      return (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
+        ? `d20cs>${this.selectedAttack.crit}`
+        : 'd20';
     },
     sizedDamage() {
       if (!this.isEnlarged) {
@@ -189,20 +196,18 @@ export default defineComponent({
       let damageDice = this.selectedAttack.damageDice;
       if (damageDice.startsWith('d')) {
         // treat d4 as 1d4 so that we can find it in the table
-        damageDice = '1'+damageDice;
+        damageDice = '1' + damageDice;
       }
 
-      let currentIndex = this.weaponDamageTable.indexOf(damageDice);
+      const currentIndex = this.weaponDamageTable.indexOf(damageDice);
       if (currentIndex < 0) {
         // not found, keep current damage
         return this.selectedAttack.damageDice;
-      } else if ((currentIndex +2) <= this.weaponDamageTable.length) {
-        // can increase by 2 steps
-        return this.weaponDamageTable[currentIndex+2];
-      } else {
-        // cannot increase by 2 steps, return max instead
-        return this.weaponDamageTable[this.weaponDamageTable.length-1];
       }
+
+      // increase by 2 steps, capped at the largest die in the table
+      const enlargedIndex = Math.min(currentIndex + 2, this.weaponDamageTable.length - 1);
+      return this.weaponDamageTable[enlargedIndex];
     },
     isCritConfirmation() {
       return this.isCritConfirmationChecked && !this.isFullAttack;
@@ -214,22 +219,12 @@ export default defineComponent({
       if (!this.selectedAttack || !this.selectedCharacter) {
         return null;
       }
-      let stat = this.selectedAttack.stat;
-      let characterStatValue = this.selectedCharacter[stat];
-
-      let statBuffTotal = 0;
-      if (this.combinedBuffs && this.combinedBuffs.hasOwnProperty(stat)) {
-        this.combinedBuffs[stat].forEach((buff: Buff) => {
-          let buffValue = Number(buff.value) || null;
-          if (buffValue) {
-            statBuffTotal += buffValue;
-          }
-        });
-
-        return characterStatValue + statBuffTotal
-      } else {
-        return characterStatValue;
-      }
+      const stat = this.selectedAttack.stat;
+      const statBuffs = this.combinedBuffs?.[stat] ?? [];
+      return statBuffs.reduce(
+        (total: number, buff: Buff) => total + (Number(buff.value) || 0),
+        this.selectedCharacter[stat]
+      );
     },
     attackStatBonus() {
       if (!this.attackStat) {
@@ -238,71 +233,21 @@ export default defineComponent({
       return Math.floor((this.attackStat - 10) / 2);
     },
     damageStatBonus() {
-      if (this.selectedAttack.type.indexOf('2h') > -1) {
-        return Math.floor(this.attackStatBonus * 1.5);
-      } else {
-        return this.attackStatBonus;
-      }
+      return this.selectedAttack.type.includes('2h')
+        ? Math.floor(this.attackStatBonus * 1.5)
+        : this.attackStatBonus;
     },
     attackBuffs() {
-      let attackString = '';
-
-      let buffs = this.getBuffs('attackMod');
-      buffs.sort(this.compareBuffValues).forEach((buff: Buff) => attackString += ' ' + this.parseBuff(buff));
-
-      return attackString;
+      return this.buffModString('attackMod');
     },
     damageBuffs() {
-      let damageString = '';
-
-      let buffs = this.getBuffs('damageMod');
-      buffs.sort(this.compareBuffValues).forEach((buff: Buff) => damageString += ' ' + this.parseBuff(buff));
-
-      return damageString;
+      return this.buffModString('damageMod');
     },
     nestedDamageDice() {
-      let extraDamageString = '';
-
-      if (this.isCritConfirmation && !this.isFullAttack) {
-        return extraDamageString;
-      }
-
-      let damageDice = this.getBuffs('damageDice');
-      damageDice.forEach((buff: Buff) => {
-        if (buff.nested) {
-          let damageString = this.parseBuff(buff);
-
-          if (damageString.startsWith('-')) {
-            extraDamageString += `-${damageString.substring(1)}`
-          } else {
-            extraDamageString += `+${damageString}`
-          }
-        }
-      });
-
-      return extraDamageString;
+      return this.damageDiceString(true);
     },
     bonusDamageDice() {
-      let extraDamageString = '';
-
-      if (this.isCritConfirmation && !this.isFullAttack) {
-        return extraDamageString;
-      }
-
-      let damageDice = this.getBuffs('damageDice');
-      damageDice.forEach((buff: Buff) => {
-        if (!buff.nested) {
-          let damageString = this.parseBuff(buff);
-
-          if (damageString.startsWith('-')) {
-            extraDamageString += `-[[${damageString.substring(1)}]]`
-          } else {
-            extraDamageString += `+[[${damageString}]]`
-          }
-        }
-      });
-
-      return extraDamageString;
+      return this.damageDiceString(false);
     },
     baseAttacks() {
       var attackRange: Array<number> = [];
@@ -327,77 +272,48 @@ export default defineComponent({
       return attackRange;
     },
     fullAttacks() {
-      var fullAttacks: Array<IterativeAttack> = [];
+      const attacks: Array<IterativeAttack> = [];
+      const prefix = this.critPrefix;
+      const first = this.baseAttacks[0];
 
-      //first attack
-      fullAttacks.push({
-        name: `${this.isCritConfirmation ? 'crit confirm ' : ''}attack ${this.baseAttacks.length > 1 ? ' 1' : ''}`,
-        value: this.baseAttacks[0]
+      // first attack
+      attacks.push({
+        name: `${prefix}attack ${this.baseAttacks.length > 1 ? ' 1' : ''}`,
+        value: first
       });
 
-      for (var extraAttackIndex in this.extraAttacks) {
-        let extraAttack = this.extraAttacks[extraAttackIndex];
+      // extra attacks (e.g. haste, natural attacks)
+      for (const extraAttack of this.extraAttacks || []) {
         if (extraAttack.value == 1) {
-          fullAttacks.push({
-            name: `${this.isCritConfirmation ? 'crit confirm ' : ''}${extraAttack.name}`,
-            value: this.baseAttacks[0]
-          });
+          attacks.push({ name: `${prefix}${extraAttack.name}`, value: first });
         } else if (extraAttack.value > 1) {
-          for (var i = 0; i < extraAttack.value; i++) {
-            fullAttacks.push({
-              name: `${this.isCritConfirmation ? 'crit confirm ' : ''}${extraAttack.name} ${i+1}`,
-              value: this.baseAttacks[0]
-            });
+          for (let i = 0; i < extraAttack.value; i++) {
+            attacks.push({ name: `${prefix}${extraAttack.name} ${i + 1}`, value: first });
           }
         }
       }
 
-      for (var i = 1; i < this.baseAttacks.length; i++) {
-        let iterative = this.baseAttacks[i];
-        fullAttacks.push({
-          name: `${this.isCritConfirmation ? 'crit confirm ' : ''}attack ${i+1}`,
-          value: iterative
-        });
+      // iterative attacks
+      for (let i = 1; i < this.baseAttacks.length; i++) {
+        attacks.push({ name: `${prefix}attack ${i + 1}`, value: this.baseAttacks[i] });
       }
 
-      return fullAttacks;
+      return attacks;
     },
     fullDamage() {
-      var attack = `${this.sizedDamage}+${this.damageStatBonus}[${this.selectedAttack.stat}]${this.damageBuffs}${this.nestedDamageDice}`
+      const attack = `${this.sizedDamage}+${this.damageStatBonus}[${this.selectedAttack.stat}]${this.damageBuffs}${this.nestedDamageDice}`
       return `[[ ${attack} ]]${this.bonusDamageDice} dmg`;
     },
     fullAttackMacro() {
-      let macro = `&{template:default} {{name=${this.selectedAttack.name}}}`;
-      if (this.isFullAttack) {
-        for (var i = 0; i < this.fullAttacks.length; i++) {
-          let attack = this.fullAttacks[i];
-          macro += `{{ ${ attack.name }=${ this.fullAttackString(attack.value) } for ${ this.fullDamage }}}`;
-        }
-      } else {
-        let attack = this.fullAttacks[this.selectedIterativeIndex];
-        macro += `{{ ${ attack.name }=${ this.fullAttackString(attack.value) } for ${ this.fullDamage }}}`;
-      }
-      return macro;
+      const macro = `&{template:default} {{name=${this.selectedAttack.name}}}`;
+      const attacks = this.isFullAttack
+        ? this.fullAttacks
+        : [this.fullAttacks[this.selectedIterativeIndex]];
+      return macro + attacks.map((attack: IterativeAttack) => this.attackMacroLine(attack)).join('');
     },
     simpleDamageRoll() {
-      var damageRoll = this.sizedDamage;
-      var damageBonus = this.damageStatBonus;
-
-      let extraDamageString = '';
-      let damageBuffs = this.getBuffs('damageMod');
-
-      damageBuffs.forEach((buff: Buff) => {
-        let buffValue = Number(buff.value) || null;
-        if (buffValue) {
-          damageBonus += buffValue;
-        } else if (buff.value.startsWith('+') || buff.value.startsWith('-')) {
-          extraDamageString += `${buff.value}`
-        } else {
-          extraDamageString += `+${buff.value}`
-        }
-      });
-
-      return `[[${damageRoll}+${damageBonus}${extraDamageString}${this.nestedDamageDice}]]${this.bonusDamageDice}`;
+      const { bonus, extra } = this.accumulateBuffs(this.getBuffs('damageMod'));
+      return `[[${this.sizedDamage}+${this.damageStatBonus + bonus}${extra}${this.nestedDamageDice}]]${this.bonusDamageDice}`;
     },
   },
   setup() {
@@ -411,42 +327,63 @@ export default defineComponent({
       return `${this.simpleAttackRoll(iterative)} for ${this.simpleDamageRoll}`;
     },
     simpleAttackRoll(iterative: IterativeAttack) {
-      var attackRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
-        ? `d20cs>${this.selectedAttack.crit}`
-        : 'd20';
-      var attackBonus = iterative.value + this.attackStatBonus;
-
-      let attackBuffs = this.getBuffs('attackMod');
-      let attackBuffNonNumeric = '';
-
-      attackBuffs.forEach((buff: Buff) => {
-        let buffValue = Number(buff.value) || null;
+      const { bonus, extra } = this.accumulateBuffs(this.getBuffs('attackMod'));
+      const attackBonus = iterative.value + this.attackStatBonus + bonus;
+      return `${iterative.name} [[${this.dieRoll}+${attackBonus}${extra}]]`;
+    },
+    // Splits a list of buffs into a numeric total (bonus) and a string of
+    // non-numeric/dice modifiers (extra), e.g. "+1d6".
+    accumulateBuffs(buffs: Array<Buff>) {
+      let bonus = 0;
+      let extra = '';
+      buffs.forEach((buff: Buff) => {
+        const buffValue = Number(buff.value) || null;
         if (buffValue) {
-          attackBonus += buffValue;
+          bonus += buffValue;
         } else if (buff.value.startsWith('+') || buff.value.startsWith('-')) {
-          attackBuffNonNumeric += `${buff.value}`
+          extra += `${buff.value}`
         } else {
-          attackBuffNonNumeric += `+${buff.value}`
+          extra += `+${buff.value}`
         }
       });
-      return `${iterative.name} [[${attackRoll}+${attackBonus}${attackBuffNonNumeric}]]`;
+      return { bonus, extra };
+    },
+    // Renders sorted buffs into a macro string, e.g. " +4[inspire courage competence]".
+    buffModString(buffName: string) {
+      return this.getBuffs(buffName)
+        .sort(this.compareBuffValues)
+        .map((buff: Buff) => ` ${this.parseBuff(buff)}`)
+        .join('');
+    },
+    // Renders damageDice buffs. `nested` selects dice added inside the main damage
+    // roll (e.g. bane's +2d6) rather than separate bonus rolls wrapped in [[ ]].
+    damageDiceString(nested: boolean) {
+      if (this.isCritConfirmation && !this.isFullAttack) {
+        return '';
+      }
+      return this.getBuffs('damageDice')
+        .filter((buff: Buff) => !!buff.nested === nested)
+        .map((buff: Buff) => {
+          const damageString = this.parseBuff(buff);
+          const negative = damageString.startsWith('-');
+          const body = negative ? damageString.substring(1) : damageString;
+          const value = nested ? body : `[[${body}]]`;
+          return `${negative ? '-' : '+'}${value}`;
+        })
+        .join('');
     },
     compareBuffValues(a: Buff, b: Buff) {
         return b.value - a.value;
     },
     getBuffs(buffName: string) {
-      if (!this.combinedBuffs || !this.combinedBuffs[buffName]) {
-        return [];
-      } else {
-        return this.combinedBuffs[buffName].flat();
-      }
+      return this.combinedBuffs?.[buffName]?.flat() ?? [];
     },
     fullAttackString(baseAttack: Number) {
-      var dieRoll = (this.selectedAttack && this.selectedAttack.crit && this.selectedAttack.crit < 20)
-        ? `d20cs>${this.selectedAttack.crit}`
-        : 'd20';
-      var attack = `${dieRoll}+${baseAttack}[base]+${this.attackStatBonus}[${this.selectedAttack.stat}]${this.attackBuffs}`
+      const attack = `${this.dieRoll}+${baseAttack}[base]+${this.attackStatBonus}[${this.selectedAttack.stat}]${this.attackBuffs}`
       return `[[ ${attack} ]]`;
+    },
+    attackMacroLine(attack: IterativeAttack) {
+      return `{{ ${attack.name}=${this.fullAttackString(attack.value)} for ${this.fullDamage}}}`;
     },
     parseBuff(buff: Buff) {
       if (!buff) {

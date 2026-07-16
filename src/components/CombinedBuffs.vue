@@ -75,44 +75,35 @@
         return this.selectedAttack.type.toLowerCase().includes('range');
       },
       combinedBonuses() {
-        let combined = {};
+        const combined = {};
 
-        for (var buffIndex in this.allBonuses) {
-          let buff = this.allBonuses[buffIndex];
+        for (const buff of this.allBonuses) {
           //example buff: { name: 'bulls strength', selected: true, bonuses: [{ strength: 4, type: 'enh'}] }
-
-          for (var bonusIndex in buff.bonuses) {
-            let bonus = buff.bonuses[bonusIndex];
+          for (const bonus of buff.bonuses || []) {
             //example bonus: { strength: 4, type: 'enh'}
-
-            for (var bonusField in bonus) {
+            for (const bonusField in bonus) {
               if (bonusField == 'type') {
                 continue;
               }
 
+              // Map weapon-specific mods to a shared bucket, skipping ones that
+              // don't apply to the selected weapon.
               let combinedType = bonusField;
               if (this.isDamageMod(combinedType)) {
-                if (this.isApplicableDamageMod(combinedType)) {
-                  combinedType = 'damageMod';
-                } else {
-                  // it is a damage mod, but not one applicable to their selected weapon
+                if (!this.isApplicableDamageMod(combinedType)) {
                   continue;
                 }
+                combinedType = 'damageMod';
               }
-
               if (this.isAttackMod(combinedType)) {
-                if (this.isApplicableAttackMod(combinedType)) {
-                  combinedType = 'attackMod';
-                } else {
+                if (!this.isApplicableAttackMod(combinedType)) {
                   continue;
                 }
+                combinedType = 'attackMod';
               }
 
-
-              let bonusValue = bonus[bonusField];
-              //example bonusValue: 4
-
-              let newBuff = {
+              const bonusValue = bonus[bonusField];
+              const newBuff = {
                 'name': buff.name,
                 'value': bonusValue,
                 'type': bonus.type,
@@ -120,29 +111,24 @@
                 'nested': bonus.nested
               };
 
-              if (combined.hasOwnProperty(combinedType)) {
-                let existingBuffs = combined[combinedType];
-                let existingIndex = existingBuffs.findIndex((existingBuff: Bonus) => bonus.type && existingBuff.type === bonus.type);
-
-                if (existingIndex >= 0) {
-                  let existingBuff = existingBuffs[existingIndex];
-
-                  if (bonus.stacks || existingBuff.stacks) {
-                    //increase the value of the existing buff
-                    newBuff.value += existingBuff.value;
-                    combined[combinedType][existingIndex] = newBuff;
-                  } else if (bonusValue > existingBuff.value) {
-                    //replace with the newer larger buff
-                    combined[combinedType][existingIndex] = newBuff;
-                  }
-                } else {
-                  //add a new type to the existing buffs
-                  combined[combinedType].push(newBuff);
-                }
-
-              } else {
-                //push a new type with the new buff
+              const existingBuffs = combined[combinedType];
+              if (!existingBuffs) {
+                //first buff of this type
                 combined[combinedType] = [newBuff];
+                continue;
+              }
+
+              const existingIndex = existingBuffs.findIndex((existingBuff: Bonus) => bonus.type && existingBuff.type === bonus.type);
+              if (existingIndex < 0) {
+                //add a new type to the existing buffs
+                existingBuffs.push(newBuff);
+              } else if (bonus.stacks || existingBuffs[existingIndex].stacks) {
+                //increase the value of the existing buff
+                newBuff.value += existingBuffs[existingIndex].value;
+                existingBuffs[existingIndex] = newBuff;
+              } else if (bonusValue > existingBuffs[existingIndex].value) {
+                //replace with the newer larger buff
+                existingBuffs[existingIndex] = newBuff;
               }
             }
           }
@@ -165,9 +151,6 @@
       }
     },
     methods: {
-      isLarger(oldVal: Number, newVal: Number) {
-        return newVal > oldVal
-      },
       isAttackMod(combinedType: string) {
         return ['meleeAttack', 'rangedAttack', 'attackMod'].includes(combinedType);
       },
