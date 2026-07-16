@@ -215,9 +215,6 @@ export default defineComponent({
       return this.combinedBuffs['extraAttacks']
     },
     attackStat() {
-      if (!this.selectedAttack || !this.selectedCharacter) {
-        return null;
-      }
       const stat = this.selectedAttack.stat;
       const statBuffs = this.combinedBuffs?.[stat] ?? [];
       return statBuffs.reduce(
@@ -226,9 +223,6 @@ export default defineComponent({
       );
     },
     attackStatBonus() {
-      if (!this.attackStat) {
-        return null;
-      }
       return Math.floor((this.attackStat - 10) / 2);
     },
     damageStatBonus() {
